@@ -71,8 +71,8 @@ public class AaAccountSmsAuthRtn extends ActivityLifecycle {
 
                     Map<String, String> smsValueMapping = new HashMap<String, String>();
                     
-                    String priority = "";
-                    priority = parameterRecord.getLimitAmt(0).getPriority().getValue();
+                   // String priority = "";
+                   // priority = parameterRecord.getLimitAmt(0).getPriority().getValue();
 
                     for (int i = 0; i < parameterRecord.getSmsEvent(0).getSmsText().size(); i++) {
                         String paraMeter = parameterRecord.getSmsEvent(0).getSmsText().get(i).getSmsVariable()
@@ -133,7 +133,8 @@ public class AaAccountSmsAuthRtn extends ActivityLifecycle {
 
                     EbJblSmsBookTable bookTable = new EbJblSmsBookTable(this);
                     EbJblSmsBookRecord bookRecord = new EbJblSmsBookRecord();
-
+                    
+                    String priority = "2";
                     bookRecord.setSmsBody(smsContent);
                     bookRecord.setSmsStatus("PENDING");
                     bookRecord.setPhone(cusPhoneNo);
@@ -153,7 +154,7 @@ public class AaAccountSmsAuthRtn extends ActivityLifecycle {
 
                     Map<String, String> smsValueMapping = new HashMap<String, String>();
                     
-                    String priority = parameterRecord.getLimitAmt(0).getPriority().getValue();
+                   // String priority = parameterRecord.getLimitAmt(0).getPriority().getValue();
 
                     for (int i = 0; i < parameterRecord.getSmsEvent(0).getSmsText().size(); i++) {
                         String paraMeter = parameterRecord.getSmsEvent(0).getSmsText().get(i).getSmsVariable()
@@ -216,6 +217,8 @@ public class AaAccountSmsAuthRtn extends ActivityLifecycle {
 
                     EbJblSmsBookTable bookTable = new EbJblSmsBookTable(this);
                     EbJblSmsBookRecord bookRecord = new EbJblSmsBookRecord();
+                    
+                    String priority = "2";
 
                     bookRecord.setSmsBody(smsContent);
                     bookRecord.setSmsStatus("PENDING");
@@ -236,8 +239,8 @@ public class AaAccountSmsAuthRtn extends ActivityLifecycle {
 
                     Map<String, String> smsValueMapping = new HashMap<String, String>();
                     
-                    String priority = "";
-                    priority = parameterRecord.getLimitAmt(0).getPriority().getValue();
+                   // String priority = "";
+                   // priority = parameterRecord.getLimitAmt(0).getPriority().getValue();
 
                     for (int i = 0; i < parameterRecord.getSmsEvent(0).getSmsText().size(); i++) {
                         String paraMeter = parameterRecord.getSmsEvent(0).getSmsText().get(i).getSmsVariable()
@@ -300,7 +303,7 @@ public class AaAccountSmsAuthRtn extends ActivityLifecycle {
 
                     EbJblSmsBookTable bookTable = new EbJblSmsBookTable(this);
                     EbJblSmsBookRecord bookRecord = new EbJblSmsBookRecord();
-
+                    String priority = "2";
                     bookRecord.setSmsBody(smsContent);
                     bookRecord.setSmsStatus("PENDING");
                     bookRecord.setPhone(cusPhoneNo);
