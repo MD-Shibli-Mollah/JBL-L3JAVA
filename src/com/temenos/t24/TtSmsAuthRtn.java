@@ -8,6 +8,8 @@ package com.temenos.t24;
  * RELATED APP    : EB.JBL.SMS.BOOK, EB.JBL.SMS.PARAMETER (ETB)
  * AUTHOR         : MD FARID HOSSAIN
  * DATE           : 18-OCT-2022
+ * MODIFIED BY    : MD SHIBLI MOLLAH
+ * DATE           : 14-MAR-2024
  */
 
 import com.temenos.t24.api.hook.system.RecordLifecycle;
@@ -63,22 +65,30 @@ public class TtSmsAuthRtn extends RecordLifecycle {
             }
 
             TellerRecord tellerRecord = new TellerRecord(currentRecord);
-
-            String debitCreditMarker        = tellerRecord.getDrCrMarker().getValue();
-            String tellerCusAcc             = tellerRecord.getAccount2().getValue();
-            String tellerCcy                = tellerRecord.getCurrency2().getValue();
-            String tellerCreditAmountLocal  = tellerRecord.getAmountLocal2().getValue();
-            String coCode                   = tellerRecord.getCoCode();
-            String tellerDateTime           = tellerRecord.getDateTime(0);
+            
+            String debitCreditMarker        = "";
+            String tellerCusAcc             = "";
+            String tellerCcy                = "";
+            String tellerCreditAmountLocal  = "";
+            String coCode                   = "";
+            String tellerDateTime           = "";
+            
+            debitCreditMarker        = tellerRecord.getDrCrMarker().getValue();
+            tellerCusAcc             = tellerRecord.getAccount2().getValue();
+            tellerCcy                = tellerRecord.getCurrency2().getValue();
+            tellerCreditAmountLocal  = tellerRecord.getAmountLocal2().getValue();
+            coCode                   = tellerRecord.getCoCode();
+            tellerDateTime           = tellerRecord.getDateTime(0);
 
             AccountRecord accRec = new AccountRecord(daAcc.getRecord("ACCOUNT", tellerCusAcc));
-            String cusId = accRec.getCustomer().getValue();
+            String cusId = "";
+            cusId = accRec.getCustomer().getValue();
             CustomerRecord cusRec = new CustomerRecord(daCus.getRecord("CUSTOMER", cusId));
             String cusPhone = null;
             String cusEmail = null;
             try {
                 cusPhone = cusRec.getPhone1(0).getPhone1().getValue();
-                cusPhone = cusRec.getPhone1(0).getEmail1().getValue();
+                cusEmail = cusRec.getPhone1(0).getEmail1().getValue();
             } catch (Exception e) {
 
             }
@@ -155,7 +165,8 @@ public class TtSmsAuthRtn extends RecordLifecycle {
                 
                 String priority     = "3";
                 String apiLink      = "";
-                Double dblTxnAmt    = Double.valueOf(tellerCreditAmountLocal);
+                Double dblTxnAmt = 0.0;
+                dblTxnAmt    = Double.valueOf(tellerCreditAmountLocal);
 
                 for (LimitAmtClass limitAmtClass : limitAmtClasses) {
                     Double dblLimAmt = Double.valueOf(limitAmtClass.getLimitAmt().getValue());

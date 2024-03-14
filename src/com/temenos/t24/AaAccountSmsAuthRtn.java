@@ -12,6 +12,8 @@ package com.temenos.t24;
  * ACTIVITY CLASS : ACCOUNTS-CLOSE-ARRANGEMENT   PROPERTY CLASS : CLOSURE   ACTION : CLOSE
  * AUTHOR         : MD FARID HOSSAIN
  * DATE           : 18-OCT-2022
+ * MODIFIED BY    : MD SHIBLI MOLLAH
+ * DATE           : 13-MAR-2024
  */
 
 import java.text.ParseException;
@@ -49,7 +51,8 @@ public class AaAccountSmsAuthRtn extends ActivityLifecycle {
         if (arrangementContext.getActivityStatus().equals("AUTH")) {
             
             DataAccess da = new DataAccess(this);
-            String cusId = arrangementRecord.getCustomer(0).getCustomer().toString();
+            String cusId = "";
+            cusId = arrangementRecord.getCustomer(0).getCustomer().toString();
             CustomerRecord cusRec = new CustomerRecord(da.getRecord("CUSTOMER", cusId));
             
             String cusPhoneNo   = "";
@@ -68,7 +71,8 @@ public class AaAccountSmsAuthRtn extends ActivityLifecycle {
 
                     Map<String, String> smsValueMapping = new HashMap<String, String>();
                     
-                    String priority = parameterRecord.getLimitAmt(0).getPriority().getValue();
+                    String priority = "";
+                    priority = parameterRecord.getLimitAmt(0).getPriority().getValue();
 
                     for (int i = 0; i < parameterRecord.getSmsEvent(0).getSmsText().size(); i++) {
                         String paraMeter = parameterRecord.getSmsEvent(0).getSmsText().get(i).getSmsVariable()
@@ -232,7 +236,8 @@ public class AaAccountSmsAuthRtn extends ActivityLifecycle {
 
                     Map<String, String> smsValueMapping = new HashMap<String, String>();
                     
-                    String priority = parameterRecord.getLimitAmt(0).getPriority().getValue();
+                    String priority = "";
+                    priority = parameterRecord.getLimitAmt(0).getPriority().getValue();
 
                     for (int i = 0; i < parameterRecord.getSmsEvent(0).getSmsText().size(); i++) {
                         String paraMeter = parameterRecord.getSmsEvent(0).getSmsText().get(i).getSmsVariable()
