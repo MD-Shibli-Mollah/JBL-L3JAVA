@@ -34,47 +34,57 @@ public class SmsServiceRtn extends ServiceLifecycle {
     public void updateRecord(String id, ServiceData serviceData, String controlItem,
             TransactionControl transactionControl, List<SynchronousTransactionData> transactionData,
             List<TStructure> records) {
-        
-        System.out.println("Processing Record :"+id);
+
+        System.out.println("Processing Record :" + id);
         DataAccess da = new DataAccess(this);
-        
+
         EbJblSmsBookTable smsBook = new EbJblSmsBookTable(this);
         EbJblSmsBookRecord smsRec = new EbJblSmsBookRecord(da.getRecord("EB.JBL.SMS.BOOK", id));
-        
-        String smsContent = smsRec.getSmsBody().getValue();
-        String phone = smsRec.getPhone().getValue();
-        String email = smsRec.getEmail().getValue();
-        
-        System.out.println(phone+ "\n" + smsContent);
-        
-        String POST_URL_TP = smsRec.getApiLink().getValue();
-        String POST_PARAMS_TP = "{\n" + "  \"body\":                               {\n"
-                + "            \"messageContent\": "    +'"'+ smsContent    +'"'+ ",\n"
-                + "            \"smsNumber\": "         +'"'+ phone         +'"'+ " \n"
-                + "            \"phoneNumber\": "       +'"'+ email         +'"'+ " \n"
+
+        String smsContent = "";
+        String phone = "";
+        String email = "";
+        try {
+            smsContent = smsRec.getSmsBody().getValue();
+            phone = smsRec.getPhone().getValue();
+            email = smsRec.getEmail().getValue();
+        } catch (Exception e1) {
+        }
+        System.out.println(phone + "\n" + smsContent);
+
+        String POST_URL_TP = "";
+        String POST_PARAMS_TP = "";
+
+        POST_URL_TP = smsRec.getApiLink().getValue();
+        POST_PARAMS_TP = "{\n" + "  \"body\":                               {\n" + "            \"messageContent\": "
+                + '"' + smsContent + '"' + ",\n" + "            \"smsNumber\": " + '"' + phone + '"' + " \n"
+                + "            \"phoneNumber\": " + '"' + email + '"' + " \n"
                 + "                                                        }\n" + "}";
-        
+
         System.out.println("Calling SMS Api");
         StringBuilder smsResponse = this.makeRestCall(POST_URL_TP, POST_PARAMS_TP);
-        
+
         JSONObject jsonSms = null;
-        
+
         try {
             jsonSms = new JSONObject(smsResponse.toString());
-        } catch (JSONException e) {}
-        
+        } catch (JSONException e) {
+        }
+
         try {
             if (jsonSms.getJSONObject("header").get("status").toString().equals("success")) {
                 smsRec.setSmsStatus("SENT");
                 try {
                     smsBook.write(id, smsRec);
-                } catch (T24IOException e) {}
+                } catch (T24IOException e) {
+                }
             }
-        } catch (JSONException e) {}            
+        } catch (JSONException e) {
+        }
     }
-    
+
     // END OF MAIN METHOD
-    
+
     public StringBuilder makeRestCall(String POST_URL, String POST_PARAMS) {
         StringBuilder response = new StringBuilder();
         HttpURLConnection con = null;
@@ -129,7 +139,7 @@ public class SmsServiceRtn extends ServiceLifecycle {
                 System.out.println("Rest call encountered an error");
             }
             con.disconnect();
-          
+
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -34,7 +34,7 @@ import com.temenos.t24.api.records.fundstransfer.FundsTransferRecord;
 import com.temenos.t24.api.system.DataAccess;
 import com.temenos.t24.api.tables.ebjblsmsbook.EbJblSmsBookTable;
 
-public class FtSmsAuthRtn extends RecordLifecycle {
+public class GbJblFtSmsAuthRtn extends RecordLifecycle {
     @Override
     public void postUpdateRequest(java.lang.String application, java.lang.String currentRecordId,
             TStructure currentRecord, List<com.temenos.t24.api.complex.eb.servicehook.TransactionData> transactionData,
@@ -215,8 +215,14 @@ public class FtSmsAuthRtn extends RecordLifecycle {
 
                     String priority = "3"; // Set default priority
                     for (LimitAmtClass limitAmtClass : limitAmtClasses) {
+                        
                         Double dblLimAmt = 0.0;
-                        dblLimAmt = Double.valueOf(limitAmtClass.getLimitAmt().getValue());
+                        // Try Catch for which returns empty value
+                        try {
+                            dblLimAmt = Double.valueOf(limitAmtClass.getLimitAmt().getValue());
+                        } catch (Exception e1) {
+                        }
+
                         if (dblLimAmt <= dblTxnAmt) {
                             priority = limitAmtClass.getPriority().getValue();
                             break;
@@ -308,11 +314,17 @@ public class FtSmsAuthRtn extends RecordLifecycle {
                     dblTxnAmt = Double.valueOf(yDbtAmt);
 
                     String priority = "3"; // Set default priority
-                    String apiLink = ""; // Set default priority
+                    String apiLink = ""; // Set default apiLink
 
                     for (LimitAmtClass limitAmtClass : limitAmtClasses) {
+                        
                         Double dblLimAmt = 0.0;
-                        dblLimAmt = Double.valueOf(limitAmtClass.getLimitAmt().getValue());
+                        // Try Catch for which returns empty value
+                        try {
+                            dblLimAmt = Double.valueOf(limitAmtClass.getLimitAmt().getValue());
+                        } catch (Exception e1) {
+                        }
+
                         if (dblLimAmt <= dblTxnAmt) {
                             priority = limitAmtClass.getPriority().getValue();
                             apiLink = limitAmtClass.getApiLink().getValue();
@@ -384,8 +396,7 @@ public class FtSmsAuthRtn extends RecordLifecycle {
                             dbtMessage.append(i);
                         }
                         if (!smsParams.get(i).getSmsVariable().getValue().equals("")) {
-                            dbtMessage
-                                    .append((smsValueMapping.get(smsParams.get(i).getSmsVariable().getValue())) + " ");
+                            dbtMessage.append((smsValueMapping.get(smsParams.get(i).getSmsVariable().getValue())) + " ");
                         }
                     }
 
@@ -409,8 +420,14 @@ public class FtSmsAuthRtn extends RecordLifecycle {
 
                     String priority = "3"; // Set default priority
                     for (LimitAmtClass limitAmtClass : limitAmtClasses) {
+                        
                         Double dblLimAmt = 0.0;
-                        dblLimAmt = Double.valueOf(limitAmtClass.getLimitAmt().getValue());
+                        // Try Catch for which returns empty value
+                        try {
+                            dblLimAmt = Double.valueOf(limitAmtClass.getLimitAmt().getValue());
+                        } catch (Exception e1) {
+                        }
+
                         if (dblLimAmt <= dblTxnAmt) {
                             priority = limitAmtClass.getPriority().getValue();
                             break;
@@ -502,8 +519,14 @@ public class FtSmsAuthRtn extends RecordLifecycle {
 
                     String priority = "3"; // Set default priority
                     for (LimitAmtClass limitAmtClass : limitAmtClasses) {
+
                         Double dblLimAmt = 0.0;
-                        dblLimAmt = Double.valueOf(limitAmtClass.getLimitAmt().getValue());
+                        // Try Catch for which returns empty value
+                        try {
+                            dblLimAmt = Double.valueOf(limitAmtClass.getLimitAmt().getValue());
+                        } catch (Exception e1) {
+                        }
+
                         if (dblLimAmt <= dblTxnAmt) {
                             priority = limitAmtClass.getPriority().getValue();
                             break;

@@ -36,7 +36,7 @@ import com.temenos.t24.api.records.teller.TellerRecord;
 import com.temenos.t24.api.system.DataAccess;
 import com.temenos.t24.api.tables.ebjblsmsbook.EbJblSmsBookTable;
 
-public class TtSmsAuthRtn extends RecordLifecycle {
+public class GbJblTtSmsAuthRtn extends RecordLifecycle {
     @Override
     public void postUpdateRequest(String application, String currentRecordId, TStructure currentRecord,
             List<TransactionData> transactionData, List<TStructure> currentRecords,
@@ -45,7 +45,7 @@ public class TtSmsAuthRtn extends RecordLifecycle {
         if (transactionContext.getCurrentFunction().equals("AUTHORISE")) {
             DataAccess daTmp = new DataAccess(this);
             DataAccess daAcc = new DataAccess(this);
-            DataAccess daCus = new DataAccess(this); 
+            DataAccess daCus = new DataAccess(this);
             DataAccess daCom = new DataAccess(this);
 
             String versionId = "";
@@ -57,28 +57,27 @@ public class TtSmsAuthRtn extends RecordLifecycle {
             EbJblSmsParameterRecord parameterRecord = null;
 
             if (versionId.equals("")) {
-                parameterRecord = new EbJblSmsParameterRecord(
-                        daTmp.getRecord("EB.JBL.SMS.PARAMETER", application));
+                parameterRecord = new EbJblSmsParameterRecord(daTmp.getRecord("EB.JBL.SMS.PARAMETER", application));
             } else {
                 parameterRecord = new EbJblSmsParameterRecord(
                         daTmp.getRecord("EB.JBL.SMS.PARAMETER", application + versionId));
             }
 
             TellerRecord tellerRecord = new TellerRecord(currentRecord);
-            
-            String debitCreditMarker        = "";
-            String tellerCusAcc             = "";
-            String tellerCcy                = "";
-            String tellerCreditAmountLocal  = "";
-            String coCode                   = "";
-            String tellerDateTime           = "";
-            
-            debitCreditMarker        = tellerRecord.getDrCrMarker().getValue();
-            tellerCusAcc             = tellerRecord.getAccount2().getValue();
-            tellerCcy                = tellerRecord.getCurrency2().getValue();
-            tellerCreditAmountLocal  = tellerRecord.getAmountLocal2().getValue();
-            coCode                   = tellerRecord.getCoCode();
-            tellerDateTime           = tellerRecord.getDateTime(0);
+
+            String debitCreditMarker = "";
+            String tellerCusAcc = "";
+            String tellerCcy = "";
+            String tellerCreditAmountLocal = "";
+            String coCode = "";
+            String tellerDateTime = "";
+
+            debitCreditMarker = tellerRecord.getDrCrMarker().getValue();
+            tellerCusAcc = tellerRecord.getAccount2().getValue();
+            tellerCcy = tellerRecord.getCurrency2().getValue();
+            tellerCreditAmountLocal = tellerRecord.getAmountLocal2().getValue();
+            coCode = tellerRecord.getCoCode();
+            tellerDateTime = tellerRecord.getDateTime(0);
 
             AccountRecord accRec = new AccountRecord(daAcc.getRecord("ACCOUNT", tellerCusAcc));
             String cusId = "";
@@ -92,9 +91,9 @@ public class TtSmsAuthRtn extends RecordLifecycle {
             } catch (Exception e) {
 
             }
-            
-            if(cusPhone.length() == 11 || cusEmail != ""){
-                
+
+            if (cusPhone.length() == 11 || cusEmail != "") {
+
                 Map<String, String> smsValueMapping = new HashMap<String, String>();
 
                 int generateMessageType = 0;
@@ -104,8 +103,8 @@ public class TtSmsAuthRtn extends RecordLifecycle {
 
                 for (int i = 0; i < parameterRecord.getSmsEvent(generateMessageType).getSmsText().size(); i++) {
 
-                    String parameter = parameterRecord.getSmsEvent(generateMessageType).getSmsText().get(i).getSmsVariable()
-                            .getValue();
+                    String parameter = parameterRecord.getSmsEvent(generateMessageType).getSmsText().get(i)
+                            .getSmsVariable().getValue();
 
                     switch (parameter) {
 
@@ -160,32 +159,41 @@ public class TtSmsAuthRtn extends RecordLifecycle {
                 smsBookRecord.setSmsStatus("PENDING");
                 smsBookRecord.setPhone(cusPhone);
                 smsBookRecord.setEmail(cusEmail);
-                
+
                 List<LimitAmtClass> limitAmtClasses = parameterRecord.getLimitAmt();
-                
-                String priority     = "3";
-                String apiLink      = "";
+
+                String priority = "3";
+                String apiLink = "";
                 Double dblTxnAmt = 0.0;
-                dblTxnAmt    = Double.valueOf(tellerCreditAmountLocal);
+                dblTxnAmt = Double.valueOf(tellerCreditAmountLocal);
 
                 for (LimitAmtClass limitAmtClass : limitAmtClasses) {
-                    Double dblLimAmt = Double.valueOf(limitAmtClass.getLimitAmt().getValue());
+                    
+                    Double dblLimAmt = 0.0;
+                    // Try Catch for which returns empty value
+                    try {
+                        dblLimAmt = Double.valueOf(limitAmtClass.getLimitAmt().getValue());
+                    } catch (Exception e1) {
+                    }
+                   // Double dblLimAmt = Double.valueOf(limitAmtClass.getLimitAmt().getValue());
                     if (dblLimAmt <= dblTxnAmt) {
                         priority = limitAmtClass.getPriority().getValue();
                         apiLink = limitAmtClass.getApiLink().getValue();
                         break;
                     }
                 }
-                
+
                 smsBookRecord.setPriority(priority);
                 smsBookRecord.setApiLink(apiLink);
 
                 try {
                     smsTable.write(debitCreditMarker + "-" + currentRecordId, smsBookRecord);
-                } catch (T24IOException e) { }
-            } 
+                } catch (T24IOException e) {
+                }
+            }
         } else {
             return;
         }
     }
 }
+

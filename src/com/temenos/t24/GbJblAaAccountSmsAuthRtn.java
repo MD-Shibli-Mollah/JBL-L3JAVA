@@ -40,7 +40,7 @@ import com.temenos.t24.api.tables.ebjblsmsparameter.SmsTextClass;
 import com.temenos.t24.api.system.DataAccess;
 import com.temenos.t24.api.tables.ebjblsmsbook.EbJblSmsBookTable;
 
-public class AaAccountSmsAuthRtn extends ActivityLifecycle {
+public class GbJblAaAccountSmsAuthRtn extends ActivityLifecycle {
     @Override
     public void postCoreTableUpdate(AaAccountDetailsRecord accountDetailRecord,
             AaArrangementActivityRecord arrangementActivityRecord, ArrangementContext arrangementContext,
