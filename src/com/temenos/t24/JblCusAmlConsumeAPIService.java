@@ -1,4 +1,4 @@
-package com.jbl.aml;
+package com.temenos.t24;
 
 /*AREA      : http://192.168.1.9:9080/BrowserWeb
 EB.API      : JblCusAmlConsumeAPIService, JblCusAmlConsumeAPIService.SELECT

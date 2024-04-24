@@ -1,4 +1,4 @@
-package com.jbl.aml;
+package com.temenos.t24;
 
 import java.util.List;
 
