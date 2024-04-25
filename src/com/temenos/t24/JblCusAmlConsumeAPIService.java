@@ -8,7 +8,7 @@ PGM.FILE    : JblCusAmlConsumeAPIService
 BATCH       : BNK/CUS.AML.SERVICE
 TSA.SERVICE : BNK/CUS.AML.SERVICE
 VERSION     : CUSTOMER,AML
-LOCAL TABLE : LT.CUS.AML
+LOCAL TABLE : LT.AML.STATUS
 DEVELOPED BY: MD FARID HOSSAIN*/
 
 import java.io.BufferedWriter;
@@ -38,7 +38,7 @@ public class JblCusAmlConsumeAPIService extends ServiceLifecycle {
     public List<String> getIds(ServiceData serviceData, List<String> controlList) {
 
         DataAccess da = new DataAccess(this);
-        List<String> recordIDs = da.selectRecords("", "CUSTOMER", "$NAU", "WITH LT.CUS.AML EQ ''");
+        List<String> recordIDs = da.selectRecords("", "CUSTOMER", "$NAU", "WITH LT.AML.STATUS EQ ''");
         int cnt = recordIDs.size();
         System.out.println(cnt + " Are Selected");
 
@@ -79,7 +79,7 @@ public class JblCusAmlConsumeAPIService extends ServiceLifecycle {
 
         try {
             if (jsonAml.getJSONObject("header").get("status").toString().equals("success")) {
-                cusRec.getLocalRefField("LT.CUS.AML").setValue("SENT");
+                cusRec.getLocalRefField("LT.AML.STATUS").setValue("SENT");
 
                 try (FileWriter fw = new FileWriter("/Temenos/T24/UD/Tracer/CustomerRecord-" + id + ".txt", true);
                         BufferedWriter bw = new BufferedWriter(fw);
