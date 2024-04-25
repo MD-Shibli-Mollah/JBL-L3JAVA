@@ -37,7 +37,7 @@ public class GbJblIApiAuth extends RecordLifecycle {
         // Encryption key (must be 16 characters for AES encryption)
         // String encryptionKey = "ThisIsASecretKey!";
         String encryptionKey = "MyKey$forJBLApi&!";
-        encryptionKey.getBytes(StandardCharsets.UTF_8);
+        encryptionKey = new String(encryptionKey.getBytes(StandardCharsets.UTF_8), StandardCharsets.UTF_8);
 
         // Encrypt username and password
         try {
