@@ -26,10 +26,9 @@ public class GbJblIApiAuth extends RecordLifecycle {
         // TODO Auto-generated method stub
         
         DataAccess da = new DataAccess(this);
-        String id;
-        id = "AML";
+
        // EbJblApiAuthTableTable apiTable = new EbJblApiAuthTableTable(this);
-        EbJblApiAuthTableRecord apiAuthRec = new EbJblApiAuthTableRecord(da.getRecord("EB.JBL.SMS.BOOK", id));
+        EbJblApiAuthTableRecord apiAuthRec = new EbJblApiAuthTableRecord(da.getRecord("EB.JBL.API.AUTH.TABLE", currentRecordId));
 
         String username = "";
         String password = "";
