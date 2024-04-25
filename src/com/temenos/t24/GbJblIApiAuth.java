@@ -9,7 +9,6 @@ import com.temenos.api.TStructure;
 import com.temenos.api.TValidationResponse;
 import com.temenos.t24.api.complex.eb.templatehook.TransactionContext;
 import com.temenos.t24.api.hook.system.RecordLifecycle;
-import com.temenos.t24.api.system.DataAccess;
 import com.temenos.t24.api.tables.ebjblapiauthtable.EbJblApiAuthTableRecord;
 
 /**
@@ -23,16 +22,12 @@ public class GbJblIApiAuth extends RecordLifecycle {
     @Override
     public TValidationResponse validateRecord(String application, String currentRecordId, TStructure currentRecord,
             TStructure unauthorisedRecord, TStructure liveRecord, TransactionContext transactionContext) {
-        // TODO Auto-generated method stub
-        
-        DataAccess da = new DataAccess(this);
 
-       // EbJblApiAuthTableTable apiTable = new EbJblApiAuthTableTable(this);
-        EbJblApiAuthTableRecord apiAuthRec = new EbJblApiAuthTableRecord(da.getRecord("EB.JBL.API.AUTH.TABLE", currentRecordId));
+        EbJblApiAuthTableRecord apiAuthRec = new EbJblApiAuthTableRecord(currentRecord);
 
         String username = "";
         String password = "";
-        String basicAuth = "";        
+        String basicAuth = "";
         try {
             username = apiAuthRec.getUsername().getValue();
             password = apiAuthRec.getPassword().getValue();
@@ -40,23 +35,23 @@ public class GbJblIApiAuth extends RecordLifecycle {
         }
 
         // Encryption key (must be 16 characters for AES encryption)
-       // String encryptionKey = "ThisIsASecretKey!";
+        // String encryptionKey = "ThisIsASecretKey!";
         String encryptionKey = "MyKey$forJBLApi&!";
         encryptionKey.getBytes(StandardCharsets.UTF_8);
-        
+
         // Encrypt username and password
         try {
             basicAuth = encryptCredentials(username + ":" + password, encryptionKey);
         } catch (Exception e) {
         }
         apiAuthRec.setBasicAuth(basicAuth);
-       // return apiAuthRec.getValidationResponse();
-         currentRecord.set(apiAuthRec.toStructure());
-         
-         return apiAuthRec.getValidationResponse();      
+        // return apiAuthRec.getValidationResponse();
+        currentRecord.set(apiAuthRec.toStructure());
+
+        return apiAuthRec.getValidationResponse();
     }
 
- // AES encryption method
+    // AES encryption method
     public static String encryptCredentials(String credentials, String encryptionKey) throws Exception {
         byte[] key = encryptionKey.getBytes();
         SecretKeySpec secretKey = new SecretKeySpec(key, "AES");
@@ -64,8 +59,5 @@ public class GbJblIApiAuth extends RecordLifecycle {
         cipher.init(Cipher.ENCRYPT_MODE, secretKey);
         byte[] encryptedBytes = cipher.doFinal(credentials.getBytes());
         return Base64.getEncoder().encodeToString(encryptedBytes);
-    }   
+    }
 }
-
-
-
