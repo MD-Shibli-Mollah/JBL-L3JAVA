@@ -2,7 +2,7 @@ package com.temenos.t24;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
-import java.nio.charset.StandardCharsets;
+//import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
 import com.temenos.api.TStructure;
@@ -37,11 +37,11 @@ public class GbJblIApiAuth extends RecordLifecycle {
         // Encryption key (must be 16 characters for AES encryption)
         // String encryptionKey = "ThisIsASecretKey!";
         String encryptionKey = "MyKey$forJBLApi&!";
-        encryptionKey = new String(encryptionKey.getBytes(StandardCharsets.UTF_8), StandardCharsets.UTF_8);
+       // encryptionKey = new String(encryptionKey.getBytes(StandardCharsets.UTF_8), StandardCharsets.UTF_8);
 
         // Encrypt username and password
         try {
-            basicAuth = encryptCredentials(username + ":" + password, encryptionKey);
+            basicAuth = this.encryptCredentials(username + ":" + password, encryptionKey);
         } catch (Exception e) {
         }
         apiAuthRec.setBasicAuth(basicAuth);
@@ -52,7 +52,7 @@ public class GbJblIApiAuth extends RecordLifecycle {
     }
 
     // AES encryption method
-    public static String encryptCredentials(String credentials, String encryptionKey) throws Exception {
+    public String encryptCredentials(String credentials, String encryptionKey) throws Exception {
         byte[] key = encryptionKey.getBytes();
         SecretKeySpec secretKey = new SecretKeySpec(key, "AES");
         Cipher cipher = Cipher.getInstance("AES");
