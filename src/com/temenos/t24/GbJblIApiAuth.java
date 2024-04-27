@@ -56,12 +56,12 @@ public class GbJblIApiAuth extends RecordLifecycle {
             // encryptionKey);
             basicAuth = this.encryptCredentials(encodedAuthString, encryptionKey);
             // Tracer
-            try (FileWriter fw = new FileWriter("/Temenos/T24/UD/Tracer/ENCRYPT-" + currentRecordId + ".txt", true);
+            /*try (FileWriter fw = new FileWriter("/Temenos/T24/UD/Tracer/ENCRYPT-" + currentRecordId + ".txt", true);
                     BufferedWriter bw = new BufferedWriter(fw);
                     PrintWriter out = new PrintWriter(bw)) {
                 out.println("MyAPI- encodedAuthString: " + encodedAuthString + "\n" + "Basic Auth: " + basicAuth);
             } catch (IOException e) {
-            }
+            }*/
             // Tracer end
         } catch (Exception e) {
         }
@@ -69,19 +69,6 @@ public class GbJblIApiAuth extends RecordLifecycle {
         apiAuthRec.setBasicAuth(basicAuth);
         apiAuthRec.setUsername("");
         apiAuthRec.setPassword("");
-
-        // Decrypt
-        String encryptedBase64Credentials = basicAuth;
-        String decryptedBase64 = decrypt(encryptedBase64Credentials, encryptionKey);
-        apiAuthRec.setJwtToken(decryptedBase64);
-
-        try (FileWriter fw = new FileWriter("/Temenos/T24/UD/Tracer/DECRYPT-" + currentRecordId + ".txt", true);
-                BufferedWriter bw = new BufferedWriter(fw);
-                PrintWriter out = new PrintWriter(bw)) {
-            out.println("MyAPI- encryptedBase64Credentials: " + encryptedBase64Credentials + "\n" + "decryptedBase64: "
-                    + decryptedBase64);
-        } catch (IOException e) {
-        }
 
         currentRecord.set(apiAuthRec.toStructure());
 
@@ -96,20 +83,6 @@ public class GbJblIApiAuth extends RecordLifecycle {
         cipher.init(Cipher.ENCRYPT_MODE, secretKey);
         byte[] encryptedBytes = cipher.doFinal(credentials.getBytes());
         return Base64.getEncoder().encodeToString(encryptedBytes);
-    }
-
-    // AES decryption method
-    public static String decrypt(String strToDecrypt, String secret) {
-        try {
-            SecretKeySpec secretKey = new SecretKeySpec(secret.getBytes(), "AES");
-            Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
-            cipher.init(Cipher.DECRYPT_MODE, secretKey);
-            byte[] decryptedBytes = cipher.doFinal(Base64.getDecoder().decode(strToDecrypt));
-            return new String(decryptedBytes);
-        } catch (Exception e) {
-            System.out.println("Error while decrypting: " + e.toString());
-        }
-        return null;
     }
 
 }

@@ -1,5 +1,14 @@
 package com.temenos.t24;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.Base64;
+
+import javax.crypto.Cipher;
+import javax.crypto.spec.SecretKeySpec;
+
 /**
  * TODO: Document me!
  *
@@ -42,6 +51,33 @@ public class Test {
         PrintWriter out = new PrintWriter(bw)) {
         out.println("basicAuth- " + encryptionKey + "\n" + basicAuth);
         } catch (IOException e) {
+        }*/
+        
+     // Decrypt
+        /*String encryptedBase64Credentials = basicAuth;
+        String decryptedBase64 = decrypt(encryptedBase64Credentials, encryptionKey);
+        apiAuthRec.setJwtToken(decryptedBase64);
+
+        try (FileWriter fw = new FileWriter("/Temenos/T24/UD/Tracer/DECRYPT-" + currentRecordId + ".txt", true);
+                BufferedWriter bw = new BufferedWriter(fw);
+                PrintWriter out = new PrintWriter(bw)) {
+            out.println("MyAPI- encryptedBase64Credentials: " + encryptedBase64Credentials + "\n" + "decryptedBase64: "
+                    + decryptedBase64);
+        } catch (IOException e) {
+        }*/
+        
+     // AES decryption method
+        /*public static String decrypt(String strToDecrypt, String secret) {
+            try {
+                SecretKeySpec secretKey = new SecretKeySpec(secret.getBytes(), "AES");
+                Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+                cipher.init(Cipher.DECRYPT_MODE, secretKey);
+                byte[] decryptedBytes = cipher.doFinal(Base64.getDecoder().decode(strToDecrypt));
+                return new String(decryptedBytes);
+            } catch (Exception e) {
+                System.out.println("Error while decrypting: " + e.toString());
+            }
+            return null;
         }*/
         
     }
