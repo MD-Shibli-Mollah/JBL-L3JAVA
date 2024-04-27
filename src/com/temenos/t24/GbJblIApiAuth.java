@@ -7,7 +7,6 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-//import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
 import com.temenos.api.TStructure;
@@ -38,8 +37,12 @@ public class GbJblIApiAuth extends RecordLifecycle {
             password = apiAuthRec.getPassword().getValue();
         } catch (Exception e1) {
         }
-        
-     // Encode username and password in Base64
+
+        if (username == "" || password == "") {
+            return apiAuthRec.getValidationResponse();
+        }
+
+        // Encode username and password in Base64
         String authString = username + ":" + password;
         String encodedAuthString = Base64.getEncoder().encodeToString(authString.getBytes());
 
@@ -49,22 +52,35 @@ public class GbJblIApiAuth extends RecordLifecycle {
 
         // Encrypt username and password
         try {
-           // basicAuth = this.encryptCredentials(username + ":" + password, encryptionKey);
+            // basicAuth = this.encryptCredentials(username + ":" + password,
+            // encryptionKey);
             basicAuth = this.encryptCredentials(encodedAuthString, encryptionKey);
-            //Tracer
+            // Tracer
             try (FileWriter fw = new FileWriter("/Temenos/T24/UD/Tracer/ENCRYPT-" + currentRecordId + ".txt", true);
                     BufferedWriter bw = new BufferedWriter(fw);
                     PrintWriter out = new PrintWriter(bw)) {
-                out.println("MyAPI- encodedAuthString: "+ encodedAuthString + "\n" + currentRecord + "\n" + basicAuth);
+                out.println("MyAPI- encodedAuthString: " + encodedAuthString + "\n" + "Basic Auth: " + basicAuth);
             } catch (IOException e) {
             }
-          //Tracer end
+            // Tracer end
         } catch (Exception e) {
         }
-        
+
         apiAuthRec.setBasicAuth(basicAuth);
         apiAuthRec.setUsername("");
         apiAuthRec.setPassword("");
+        
+        // Decrypt
+        String encryptedBase64Credentials = basicAuth;       
+        String decryptedBase64Credentials = decrypt(encryptedBase64Credentials, encryptionKey);        
+        apiAuthRec.setJwtToken(decryptedBase64Credentials);
+        
+        try (FileWriter fw = new FileWriter("/Temenos/T24/UD/Tracer/DECRYPT-" + currentRecordId + ".txt", true);
+                BufferedWriter bw = new BufferedWriter(fw);
+                PrintWriter out = new PrintWriter(bw)) {
+            out.println("MyAPI- encryptedBase64Credentials: " + encryptedBase64Credentials + "\n" + "decryptedBase64Credentials: " + decryptedBase64Credentials);
+        } catch (IOException e) {
+        }
         
         currentRecord.set(apiAuthRec.toStructure());
 
@@ -80,4 +96,20 @@ public class GbJblIApiAuth extends RecordLifecycle {
         byte[] encryptedBytes = cipher.doFinal(credentials.getBytes());
         return Base64.getEncoder().encodeToString(encryptedBytes);
     }
+    
+ // AES decryption method
+    public static String decrypt(String strToDecrypt, String secret) {
+        try {
+            SecretKeySpec secretKey = new SecretKeySpec(secret.getBytes(), "AES");
+            Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+            cipher.init(Cipher.DECRYPT_MODE, secretKey);
+            byte[] decryptedBytes = cipher.doFinal(Base64.getDecoder().decode(strToDecrypt));
+            return new String(decryptedBytes);
+        } catch (Exception e) {
+            System.out.println("Error while decrypting: " + e.toString());
+        }
+        return null;
+    }
+    
+    
 }
