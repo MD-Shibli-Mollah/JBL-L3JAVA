@@ -2,6 +2,11 @@ package com.temenos.t24;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
+
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 //import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
@@ -33,6 +38,10 @@ public class GbJblIApiAuth extends RecordLifecycle {
             password = apiAuthRec.getPassword().getValue();
         } catch (Exception e1) {
         }
+        
+     // Encode username and password in Base64
+        String authString = username + ":" + password;
+        String encodedAuthString = Base64.getEncoder().encodeToString(authString.getBytes());
 
         // Encryption key (must be 16 characters for AES encryption)
         // String encryptionKey = "ThisIsASecretKey!";
@@ -40,11 +49,23 @@ public class GbJblIApiAuth extends RecordLifecycle {
 
         // Encrypt username and password
         try {
-            basicAuth = this.encryptCredentials(username + ":" + password, encryptionKey);
+           // basicAuth = this.encryptCredentials(username + ":" + password, encryptionKey);
+            basicAuth = this.encryptCredentials(encodedAuthString, encryptionKey);
+            //Tracer
+            try (FileWriter fw = new FileWriter("/Temenos/T24/UD/Tracer/ENCRYPT-" + currentRecordId + ".txt", true);
+                    BufferedWriter bw = new BufferedWriter(fw);
+                    PrintWriter out = new PrintWriter(bw)) {
+                out.println("MyAPI- encodedAuthString: "+ encodedAuthString + "\n" + currentRecord + "\n" + basicAuth);
+            } catch (IOException e) {
+            }
+          //Tracer end
         } catch (Exception e) {
         }
+        
         apiAuthRec.setBasicAuth(basicAuth);
-        // return apiAuthRec.getValidationResponse();
+        apiAuthRec.setUsername("");
+        apiAuthRec.setPassword("");
+        
         currentRecord.set(apiAuthRec.toStructure());
 
         return apiAuthRec.getValidationResponse();

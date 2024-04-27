@@ -37,6 +37,13 @@ public class Test {
             System.out.println(myName);
         }*/
         
+        /*try (FileWriter fw = new FileWriter("D:\\Temenos\\t24home\\default\\DL.BP-" + currentRecordId + ".txt", true);
+        BufferedWriter bw = new BufferedWriter(fw);
+        PrintWriter out = new PrintWriter(bw)) {
+        out.println("basicAuth- " + encryptionKey + "\n" + basicAuth);
+        } catch (IOException e) {
+        }*/
+        
     }
 
 }
