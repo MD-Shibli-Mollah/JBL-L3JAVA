@@ -57,7 +57,7 @@ public class GbJblICusTestBase64 extends RecordLifecycle {
         // Decrypt
         String encryptedBase64Credentials = basicAuth;
         String decryptedBase64 = decrypt(encryptedBase64Credentials, decryptionKey);
-
+        // Tracer
         try (FileWriter fw = new FileWriter("/Temenos/T24/UD/Tracer/DECRYPT-" + currentRecordId + ".txt", true);
                 BufferedWriter bw = new BufferedWriter(fw);
                 PrintWriter out = new PrintWriter(bw)) {
@@ -65,6 +65,7 @@ public class GbJblICusTestBase64 extends RecordLifecycle {
                     + decryptedBase64);
         } catch (IOException e) {
         }
+        // Tracer END
 
         // API Call
         String POST_URL_TP = "";
@@ -84,7 +85,18 @@ public class GbJblICusTestBase64 extends RecordLifecycle {
         }
 
         try {
-            if (jsonSms.getJSONObject("header").get("status").toString().equals("success")) {                
+            if (jsonSms.getJSONObject("header").get("status").toString().equals("success")) {
+                
+             // Tracer
+                try (FileWriter fw = new FileWriter("/Temenos/T24/UD/Tracer/DECRYPT-" + currentRecordId + ".txt", true);
+                        BufferedWriter bw = new BufferedWriter(fw);
+                        PrintWriter out = new PrintWriter(bw)) {
+                    out.println("MyAPI- encryptedBase64Credentials: " + encryptedBase64Credentials + "\n" + "decryptedBase64: "
+                            + decryptedBase64);
+                } catch (IOException e) {
+                }
+                // Tracer END
+                
                 recordForCustomer.setAmlCheck("SENT");
             }
         } catch (JSONException e) {
