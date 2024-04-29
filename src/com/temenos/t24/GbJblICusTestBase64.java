@@ -40,7 +40,7 @@ public class GbJblICusTestBase64 extends RecordLifecycle {
 
         DataAccess da = new DataAccess(this);
         CustomerRecord recordForCustomer = new CustomerRecord(currentRecord);
-        
+
         String id = "";
         id = "AML";
         EbJblApiAuthTableRecord apiAuthRec = new EbJblApiAuthTableRecord(da.getRecord("EB.JBL.API.AUTH.TABLE", id));
@@ -62,7 +62,7 @@ public class GbJblICusTestBase64 extends RecordLifecycle {
                 BufferedWriter bw = new BufferedWriter(fw);
                 PrintWriter out = new PrintWriter(bw)) {
             out.println("MyAPI- encryptedBase64Credentials: " + encryptedBase64Credentials + "\n" + "decryptedBase64: "
-                    + decryptedBase64);
+                    + decryptedBase64 + "\n");
         } catch (IOException e) {
         }
         // Tracer END
@@ -72,36 +72,44 @@ public class GbJblICusTestBase64 extends RecordLifecycle {
         String POST_PARAMS_TP = "";
 
         POST_URL_TP = "http://localhost:9089/irf-auth-token-generation-container-21.0.59/api/v1.0.0/generateauthtoken";
-        
+
         POST_PARAMS_TP = "";
 
         StringBuilder jwtResponse = this.makeRestCall(POST_URL_TP, POST_PARAMS_TP);
 
-        JSONObject jsonSms = null;
+        // Tracer
+        try (FileWriter fw = new FileWriter("/Temenos/T24/UD/Tracer/DECRYPT-" + currentRecordId + ".txt", true);
+                BufferedWriter bw = new BufferedWriter(fw);
+                PrintWriter out = new PrintWriter(bw)) {
+            out.println("MyAPI- POST_URL_TP: " + POST_URL_TP + "\n" + "jwtResponse: " + jwtResponse + "\n");
+        } catch (IOException e) {
+        }
+        // Tracer END
+
+        JSONObject jsonApiRes = null;
 
         try {
-            jsonSms = new JSONObject(jwtResponse.toString());
+            jsonApiRes = new JSONObject(jwtResponse.toString());
         } catch (JSONException e) {
         }
 
         try {
-            if (jsonSms.getJSONObject("header").get("status").toString().equals("success")) {
-                
-             // Tracer
+            if (jsonApiRes.getJSONObject("header").get("status").toString().equals("success")) {
+
+                // Tracer
                 try (FileWriter fw = new FileWriter("/Temenos/T24/UD/Tracer/DECRYPT-" + currentRecordId + ".txt", true);
                         BufferedWriter bw = new BufferedWriter(fw);
                         PrintWriter out = new PrintWriter(bw)) {
-                    out.println("MyAPI- encryptedBase64Credentials: " + encryptedBase64Credentials + "\n" + "decryptedBase64: "
-                            + decryptedBase64);
+                    out.println("MyAPI- jsonApiRes: " + jsonApiRes + "\n");
                 } catch (IOException e) {
                 }
                 // Tracer END
-                
+
                 recordForCustomer.setAmlCheck("SENT");
             }
         } catch (JSONException e) {
-        }        
-        
+        }
+
         return recordForCustomer.getValidationResponse();
     }
 
@@ -118,7 +126,7 @@ public class GbJblICusTestBase64 extends RecordLifecycle {
         }
         return null;
     }
-    
+
     // Method for API Call (Generate JWT Token)
     public StringBuilder makeRestCall(String POST_URL, String POST_PARAMS) {
         StringBuilder response = new StringBuilder();
@@ -181,7 +189,3 @@ public class GbJblICusTestBase64 extends RecordLifecycle {
         return response;
     }
 }
-
-
-
-
