@@ -34,6 +34,7 @@ import com.temenos.t24.api.tables.ebjblapiauthtable.EbJblApiAuthTableRecord;
  */
 public class GbJblICusTestBase64 extends RecordLifecycle {
 
+    String decryptedBase64 = "";
     @Override
     public TValidationResponse validateRecord(String application, String currentRecordId, TStructure currentRecord,
             TStructure unauthorisedRecord, TStructure liveRecord, TransactionContext transactionContext) {
@@ -136,7 +137,9 @@ public class GbJblICusTestBase64 extends RecordLifecycle {
             con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("POST");
             con.setRequestProperty("Content-Type", "application/json");
-            con.setRequestProperty("Authorization", "Basic SU5QVVRUOjEyMzQ1Ng==");
+            // con.setRequestProperty("Authorization", "Basic SU5QVVRUOjEyMzQ1Ng==");
+            String basicAuth = "Basic " + decryptedBase64;
+            con.setRequestProperty("Authorization", basicAuth);
             con.setDoOutput(true);
             try {
                 OutputStream os = con.getOutputStream();
