@@ -14,9 +14,9 @@ import com.temenos.t24.api.records.stmtentry.StmtEntryRecord;
 import com.temenos.t24.api.system.DataAccess;
 
 /**
- * TODO: Nofile Enquiry routine for - IRD of University Teachers Salary Information
-        EB.API - NOF.NofileEnqTeacherSalary
-        STANDARD.SELECTION>NOFILE.JBL.TSI.TEACHER.SALARY
+ * TODO: Nofile Enquiry routine for - IRD of University Teachers Salary
+ * Information EB.API - NOF.NofileEnqTeacherSalary
+ * STANDARD.SELECTION>NOFILE.JBL.TSI.TEACHER.SALARY
  *
  * @author MD Shibli Mollah
  *
@@ -27,33 +27,37 @@ public class NofileEnqTeacherSalary extends Enquiry {
     public List<String> setIds(List<FilterCriteria> filterCriteria, EnquiryContext enquiryContext) {
         // TODO Auto-generated method stub
         DataAccess da = new DataAccess(this);
-        
+
         List<String> retSalaryInfo = new ArrayList<String>();
-        
+
         String selAccountNo = filterCriteria.get(0).getValue();
         String selMonth = filterCriteria.get(1).getValue();
         String selYear = filterCriteria.get(2).getValue();
         // checking for Valid AC No
-        Account account = new Account(this);        
-        String isTrue = account.isValidAccountId().get();
-        
-        if (account.isValidAccountId().get() != "True") {
-            System.out.println(isTrue);
-            retSalaryInfo.add("6" + "*" + "false");
-            return retSalaryInfo;
-        }
-        
+        Account account = new Account(this);
+        account.setAccountId(selAccountNo);
+
         if (selAccountNo.equals("") || selAccountNo.equals(null) || selMonth.equals("") || selMonth.equals(null)
                 || selYear.equals("") || selYear.equals(null)) {
             retSalaryInfo.add("6" + "*" + "false");
             return retSalaryInfo;
         }
-        account.setAccountId(selAccountNo);
+
+        try {
+            String isTrue = account.isValidAccountId().get();
+            System.out.println(isTrue);
+        } catch (Exception e) {
+        }
+        if (account.isValidAccountId().get() != "True") {
+
+            retSalaryInfo.add("6" + "*" + "false");
+            return retSalaryInfo;
+        }
 
         LocalDate date = null;
-        try{
-           date = LocalDate.of(Integer.parseInt(selYear), Integer.parseInt(selMonth), 1);
-        }catch (Exception e) {
+        try {
+            date = LocalDate.of(Integer.parseInt(selYear), Integer.parseInt(selMonth), 1);
+        } catch (Exception e) {
             retSalaryInfo.add("6" + "*" + "false");
             return retSalaryInfo;
         }
@@ -70,14 +74,16 @@ public class NofileEnqTeacherSalary extends Enquiry {
         for (String stmt : stmtRecords) {
             stmtRec = new StmtEntryRecord(da.getRecord("STMT.ENTRY", stmt));
             if (Integer.parseInt(stmtRec.getTransactionCode().getValue()) == 213) {
-                LocalDate salaryDate = LocalDate.parse(stmtRec.getValueDate().getValue(),DateTimeFormatter.ofPattern("yyyyMMdd"));
-                if (salaryDate.getDayOfMonth() >= startDate.getDay() && salaryDate.getDayOfMonth() <= endDate.getDay()) {
+                LocalDate salaryDate = LocalDate.parse(stmtRec.getValueDate().getValue(),
+                        DateTimeFormatter.ofPattern("yyyyMMdd"));
+                if (salaryDate.getDayOfMonth() >= startDate.getDay()
+                        && salaryDate.getDayOfMonth() <= endDate.getDay()) {
                     retSalaryInfo.add("0" + "*" + "true");
                     return retSalaryInfo;
                 }
             }
         }
-        
+
         retSalaryInfo.add("0" + "*" + "false");
         return retSalaryInfo;
     }
