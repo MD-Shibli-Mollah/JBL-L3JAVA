@@ -27,16 +27,27 @@ public class NofileEnqTeacherSalary extends Enquiry {
     public List<String> setIds(List<FilterCriteria> filterCriteria, EnquiryContext enquiryContext) {
         // TODO Auto-generated method stub
         DataAccess da = new DataAccess(this);
+        
         List<String> retSalaryInfo = new ArrayList<String>();
+        
         String selAccountNo = filterCriteria.get(0).getValue();
         String selMonth = filterCriteria.get(1).getValue();
         String selYear = filterCriteria.get(2).getValue();
+        // checking for Valid AC No
+        Account account = new Account(this);        
+        String isTrue = account.isValidAccountId().get();
+        
+        if (account.isValidAccountId().get() != "True") {
+            System.out.println(isTrue);
+            retSalaryInfo.add("6" + "*" + "false");
+            return retSalaryInfo;
+        }
+        
         if (selAccountNo.equals("") || selAccountNo.equals(null) || selMonth.equals("") || selMonth.equals(null)
                 || selYear.equals("") || selYear.equals(null)) {
             retSalaryInfo.add("6" + "*" + "false");
             return retSalaryInfo;
         }
-        Account account = new Account(this);
         account.setAccountId(selAccountNo);
 
         LocalDate date = null;
