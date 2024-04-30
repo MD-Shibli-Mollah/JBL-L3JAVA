@@ -33,23 +33,18 @@ public class NofileEnqTeacherSalary extends Enquiry {
         String selAccountNo = filterCriteria.get(0).getValue();
         String selMonth = filterCriteria.get(1).getValue();
         String selYear = filterCriteria.get(2).getValue();
-        // checking for Valid AC No
+        
+        // checking for Valid AC No -- Returns "1" or "0"
         Account account = new Account(this);
         account.setAccountId(selAccountNo);
-
-        if (selAccountNo.equals("") || selAccountNo.equals(null) || selMonth.equals("") || selMonth.equals(null)
-                || selYear.equals("") || selYear.equals(null)) {
+        
+        if (account.isValidAccountId().get() == "0") {
             retSalaryInfo.add("6" + "*" + "false");
             return retSalaryInfo;
         }
 
-        try {
-            String isTrue = account.isValidAccountId().get();
-            System.out.println(isTrue);
-        } catch (Exception e) {
-        }
-        if (account.isValidAccountId().get() != "True") {
-
+        if (selAccountNo.equals("") || selAccountNo.equals(null) || selMonth.equals("") || selMonth.equals(null)
+                || selYear.equals("") || selYear.equals(null)) {
             retSalaryInfo.add("6" + "*" + "false");
             return retSalaryInfo;
         }
