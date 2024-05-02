@@ -3,9 +3,7 @@ package com.temenos.t24;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import com.temenos.api.TDate;
 import com.temenos.t24.api.complex.eb.enquiryhook.EnquiryContext;
@@ -35,20 +33,13 @@ public class NofileEnqTeacherSalary extends Enquiry {
         String selAccountNo = filterCriteria.get(0).getValue();
         String selMonth = filterCriteria.get(1).getValue();
         String selYear = filterCriteria.get(2).getValue();
-        
-        Map<String, String> nofValueMapping = new HashMap<String, String>();
-        nofValueMapping.put("responseCode", "6");
-        nofValueMapping.put("isSalaryPaid", "false");
-        String nofStr = nofValueMapping.toString();
-        
+
         // checking for Valid AC No -- Returns "1" or "0"
         Account account = new Account(this);
         account.setAccountId(selAccountNo);
-        
+
         if (account.isValidAccountId().get() == "0") {
-            
-           // retSalaryInfo.add("6" + "*" + "false");
-            retSalaryInfo.add(nofStr);
+            retSalaryInfo.add("6" + "*" + "false");
             return retSalaryInfo;
         }
 

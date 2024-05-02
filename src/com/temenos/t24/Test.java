@@ -5,6 +5,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Base64;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
@@ -79,6 +81,11 @@ public class Test {
             }
             return null;
         }*/
+        
+        /*Map<String, String> nofValueMapping = new HashMap<String, String>();
+        nofValueMapping.put("responseCode", "6");
+        nofValueMapping.put("isSalaryPaid", "false");
+        String nofStr = nofValueMapping.toString();*/
         
     }
 
