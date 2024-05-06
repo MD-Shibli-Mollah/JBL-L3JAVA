@@ -1,5 +1,17 @@
 package com.temenos.t24;
 
+/*
+ * MODULE         : LOCAL REMITTANCE (TT)
+ * VERSION        : TELLER,JBL.TT.ISSUE.INIT
+ * EB.API         : GbJblIWalkInCusDtls
+ * ATTACHED AS    : INPUT ROUTINE
+ * RELATED APP    : N/A
+ * AUTHOR         : MD FARID HOSSAIN
+ * DATE           : 18-OCT-2022
+ * MODIFIED BY    : MD SHIBLI MOLLAH
+ * DATE           : 13-MAR-2024
+ */
+
 import com.temenos.api.TStructure;
 import com.temenos.api.TValidationResponse;
 import com.temenos.t24.api.complex.eb.templatehook.TransactionContext;
