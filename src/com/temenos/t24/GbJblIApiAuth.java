@@ -13,9 +13,10 @@ import com.temenos.t24.api.tables.ebjblapiauthtable.EbJblApiAuthTableRecord;
 
 /**
  * TODO: Encryption for BASIC Auth
- *
+ *       Attached to - EB.JBL.API.AUTH.TABLE,
+ *       EB.API - GbJblIApiAuth
  * @author MD Shibli Mollah
- *
+ * 
  */
 public class GbJblIApiAuth extends RecordLifecycle {
 
