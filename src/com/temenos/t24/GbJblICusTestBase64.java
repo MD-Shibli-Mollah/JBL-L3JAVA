@@ -104,8 +104,18 @@ public class GbJblICusTestBase64 extends RecordLifecycle {
             // Parse the response JSON
             // String myjwtResponseString = jwtResponse.toString();
             // Remove surrounding double quotes from the response
-            String trimmedResponse = jwtResponse.toString().replaceAll("^\"|\"$", "");
+            String trimmedResponse = jwtResponse.toString().replaceAll("^\"|\"$", "").replace("\\", "");
             JSONObject jsonResponse = new JSONObject(trimmedResponse);
+
+            // Tracer
+            try (FileWriter fw = new FileWriter("/Temenos/T24/UD/Tracer/DECRYPT-" + currentRecordId + ".txt", true);
+                    BufferedWriter bw = new BufferedWriter(fw);
+                    PrintWriter out = new PrintWriter(bw)) {
+                out.println(
+                        "\n Trimmed Response: " + trimmedResponse + "\n" + " Json Response: " + jsonResponse + "\n");
+            } catch (IOException e) {
+            }
+            // Tracer END
 
             // Extract the token value
             String token = "";
