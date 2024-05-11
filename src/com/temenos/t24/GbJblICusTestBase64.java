@@ -102,21 +102,25 @@ public class GbJblICusTestBase64 extends RecordLifecycle {
          */
         try {
             // Parse the response JSON
-            JSONObject jsonResponse = null;
-            jsonResponse = new JSONObject(jwtResponse);
+            JSONObject jsonResponse = new JSONObject(jwtResponse);
             // Extract the token value
             String token = "";
-            token = jsonResponse.getString("id_token");
-            // Write the JWT Token in EB.JBL.API.AUTH.TABLE Template...
-            
-            EbJblApiAuthTableTable apiAuthTable = new EbJblApiAuthTableTable(this);
-            apiAuthRec.setJwtToken(token);
-            
-            try {
-                apiAuthTable.write(id, apiAuthRec);
-            } catch (T24IOException e) {
+
+            if (jsonResponse.has("id_token")) {
+                token = jsonResponse.getString("id_token");
+                
+                // Write the JWT Token in EB.JBL.API.AUTH.TABLE Template...
+                EbJblApiAuthTableTable apiAuthTable = new EbJblApiAuthTableTable(this);
+                apiAuthRec.setJwtToken(token);
+
+                try {
+                    apiAuthTable.write(id, apiAuthRec);
+                } catch (T24IOException e) {
+                }
+            } else {
+                System.out.println("Error: id_token is not found in JSON response");
             }
-            
+
         } catch (Exception e) {
             System.out.println("Error occurred while extracting token: " + e.getMessage());
         }
