@@ -61,6 +61,15 @@ public class GbJblICusTestBase64 extends RecordLifecycle {
         // Decrypt
         String encryptedBase64Credentials = basicAuth;
         decryptedBase64 = decrypt(encryptedBase64Credentials, decryptionKey);
+        
+     // Tracer
+        try (FileWriter fw = new FileWriter("/Temenos/T24/UD/Tracer/DECRYPT-" + currentRecordId + ".txt", true);
+                BufferedWriter bw = new BufferedWriter(fw);
+                PrintWriter out = new PrintWriter(bw)) {
+            out.println("decryptedBase64: " + decryptedBase64 + "\n");
+        } catch (IOException e) {
+        }
+        // Tracer END
 
         // API Call
         // String POST_URL_TP = "";
@@ -84,7 +93,6 @@ public class GbJblICusTestBase64 extends RecordLifecycle {
          */
         try {
             // Parse the response JSON
-            // String myjwtResponseString = jwtResponse.toString();
             // Remove surrounding double quotes from the response & remove
             // backslash(\) from the response...
             String trimmedResponse = jwtResponse.toString().replaceAll("^\"|\"$", "").replace("\\", "");
