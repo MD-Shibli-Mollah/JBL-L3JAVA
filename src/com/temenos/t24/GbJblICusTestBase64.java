@@ -60,16 +60,7 @@ public class GbJblICusTestBase64 extends RecordLifecycle {
 
         // Decrypt
         String encryptedBase64Credentials = basicAuth;
-        this.decryptedBase64 = decrypt(encryptedBase64Credentials, decryptionKey);
-        // Tracer
-        try (FileWriter fw = new FileWriter("/Temenos/T24/UD/Tracer/DECRYPT-" + currentRecordId + ".txt", true);
-                BufferedWriter bw = new BufferedWriter(fw);
-                PrintWriter out = new PrintWriter(bw)) {
-            out.println("MyAPI- encryptedBase64Credentials: " + encryptedBase64Credentials + "\n" + "decryptedBase64: "
-                    + decryptedBase64 + "\n");
-        } catch (IOException e) {
-        }
-        // Tracer END
+        decryptedBase64 = decrypt(encryptedBase64Credentials, decryptionKey);
 
         // API Call
         // String POST_URL_TP = "";
@@ -83,15 +74,6 @@ public class GbJblICusTestBase64 extends RecordLifecycle {
 
         StringBuilder jwtResponse = this.makeGetRequest(GET_URL_TP);
 
-        // Tracer
-        try (FileWriter fw = new FileWriter("/Temenos/T24/UD/Tracer/DECRYPT-" + currentRecordId + ".txt", true);
-                BufferedWriter bw = new BufferedWriter(fw);
-                PrintWriter out = new PrintWriter(bw)) {
-            out.println("MyAPI- GET_URL_TP: " + GET_URL_TP + "\n" + "jwtResponse: " + jwtResponse + "\n");
-        } catch (IOException e) {
-        }
-        // Tracer END
-
         /*
          * JSONObject jsonApiRes = null; try { jsonApiRes = new
          * JSONObject(jwtResponse.toString()); } catch (JSONException e) { } try
@@ -103,36 +85,37 @@ public class GbJblICusTestBase64 extends RecordLifecycle {
         try {
             // Parse the response JSON
             // String myjwtResponseString = jwtResponse.toString();
-            // Remove surrounding double quotes from the response & remove backslash(\) from the response...
+            // Remove surrounding double quotes from the response & remove
+            // backslash(\) from the response...
             String trimmedResponse = jwtResponse.toString().replaceAll("^\"|\"$", "").replace("\\", "");
             JSONObject jsonResponse = new JSONObject(trimmedResponse);
-
-            // Tracer
-            try (FileWriter fw = new FileWriter("/Temenos/T24/UD/Tracer/DECRYPT-" + currentRecordId + ".txt", true);
-                    BufferedWriter bw = new BufferedWriter(fw);
-                    PrintWriter out = new PrintWriter(bw)) {
-                out.println(
-                        "\n Trimmed Response: " + trimmedResponse + "\n" + " Json Response: " + jsonResponse + "\n");
-            } catch (IOException e) {
-            }
-            // Tracer END
 
             // Extract the token value
             String token = "";
             if (jsonResponse.has("id_token")) {
                 token = jsonResponse.getString("id_token");
-
-                // Write the JWT Token in EB.JBL.API.AUTH.TABLE Template...
-                EbJblApiAuthTableTable apiAuthTable = new EbJblApiAuthTableTable(this);
-                apiAuthRec.setJwtToken(token);
-
-                try {
-                    apiAuthTable.write(id, apiAuthRec);
-                } catch (T24IOException e) {
-                }
             } else {
                 System.out.println("Error: id_token is not found in JSON response");
             }
+
+            // Write the JWT Token in EB.JBL.API.AUTH.TABLE Template...
+            EbJblApiAuthTableTable apiAuthTable = new EbJblApiAuthTableTable(this);
+            apiAuthRec.setJwtToken(token);
+
+            try {
+                apiAuthTable.write(id, apiAuthRec);
+            } catch (T24IOException e) {
+            }
+
+            // Tracer
+            try (FileWriter fw = new FileWriter("/Temenos/T24/UD/Tracer/DECRYPT-" + currentRecordId + ".txt", true);
+                    BufferedWriter bw = new BufferedWriter(fw);
+                    PrintWriter out = new PrintWriter(bw)) {
+                out.println("Trimmed Response: " + trimmedResponse + "\n" + " Json Response: " + jsonResponse + "\n"
+                        + " token: " + token + "\n");
+            } catch (IOException e) {
+            }
+            // Tracer END
 
         } catch (Exception e) {
             System.out.println("Error occurred while extracting token: " + e.getMessage());
