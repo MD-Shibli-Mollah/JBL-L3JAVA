@@ -102,13 +102,14 @@ public class GbJblICusTestBase64 extends RecordLifecycle {
          */
         try {
             // Parse the response JSON
-            JSONObject jsonResponse = new JSONObject(jwtResponse);
+            String myjwtResponseString = jwtResponse.toString();
+            JSONObject jsonResponse = new JSONObject(myjwtResponseString);
             // Extract the token value
             String token = "";
 
             if (jsonResponse.has("id_token")) {
                 token = jsonResponse.getString("id_token");
-                
+
                 // Write the JWT Token in EB.JBL.API.AUTH.TABLE Template...
                 EbJblApiAuthTableTable apiAuthTable = new EbJblApiAuthTableTable(this);
                 apiAuthRec.setJwtToken(token);
