@@ -103,7 +103,7 @@ public class GbJblICusTestBase64 extends RecordLifecycle {
         try {
             // Parse the response JSON
             // String myjwtResponseString = jwtResponse.toString();
-            // Remove surrounding double quotes from the response
+            // Remove surrounding double quotes from the response & remove backslash(\) from the response...
             String trimmedResponse = jwtResponse.toString().replaceAll("^\"|\"$", "").replace("\\", "");
             JSONObject jsonResponse = new JSONObject(trimmedResponse);
 
