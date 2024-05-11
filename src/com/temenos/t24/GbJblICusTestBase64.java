@@ -102,11 +102,13 @@ public class GbJblICusTestBase64 extends RecordLifecycle {
          */
         try {
             // Parse the response JSON
-            String myjwtResponseString = jwtResponse.toString();
-            JSONObject jsonResponse = new JSONObject(myjwtResponseString);
+            // String myjwtResponseString = jwtResponse.toString();
+            // Remove surrounding double quotes from the response
+            String trimmedResponse = jwtResponse.toString().replaceAll("^\"|\"$", "");
+            JSONObject jsonResponse = new JSONObject(trimmedResponse);
+
             // Extract the token value
             String token = "";
-
             if (jsonResponse.has("id_token")) {
                 token = jsonResponse.getString("id_token");
 
@@ -126,6 +128,7 @@ public class GbJblICusTestBase64 extends RecordLifecycle {
             System.out.println("Error occurred while extracting token: " + e.getMessage());
         }
         recordForCustomer.setAmlCheck("SENT");
+        recordForCustomer.toStructure(); // MUST Require to update in T24
         return recordForCustomer.getValidationResponse();
     }
 
