@@ -44,10 +44,6 @@ public class GbJblICusTestBase64 extends RecordLifecycle {
 
         DataAccess da = new DataAccess(this);
         CustomerRecord recordForCustomer = new CustomerRecord(currentRecord);
-        
-        // test record set
-        recordForCustomer.setCustBirthCity("Bangladesh");
-        recordForCustomer.setSector("1002");
 
         String id = "";
        // id = "AML";
@@ -125,7 +121,7 @@ public class GbJblICusTestBase64 extends RecordLifecycle {
             System.out.println("Error occurred while extracting token: " + e.getMessage());
         }
         recordForCustomer.setAmlCheck("SENT");
-        // MUST Require to update in T24
+        // N.B: MUST Require to update in T24 -- Need to use setDefaultVieldValue to set records in the CORE TABLE
         currentRecord.set(recordForCustomer.toStructure());
         return recordForCustomer.getValidationResponse();
     }
