@@ -13,10 +13,12 @@ import java.util.Base64;
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.temenos.api.TStructure;
 import com.temenos.api.exceptions.T24IOException;
+// import com.temenos.t24.api.complex.eb.servicehook.SynchronousTransactionData;
 import com.temenos.t24.api.complex.eb.templatehook.TransactionContext;
 import com.temenos.t24.api.hook.system.RecordLifecycle;
 import com.temenos.t24.api.records.customer.CustomerRecord;
@@ -34,6 +36,7 @@ public class GbJblICusAML extends RecordLifecycle {
 
     String encryptedBase64Credentials = "";
     String decryptedBase64 = "";
+    String myJwtToken = "";
 
     @Override
     public void defaultFieldValues(String application, String currentRecordId, TStructure currentRecord,
@@ -47,61 +50,99 @@ public class GbJblICusAML extends RecordLifecycle {
         EbJblApiAuthTableRecord apiAuthRec = new EbJblApiAuthTableRecord(da.getRecord("EB.JBL.API.AUTH.TABLE", id));
 
         String basicAuth = "";
-        String myJwtToken = "";
         try {
             basicAuth = apiAuthRec.getBasicAuth().getValue();
             myJwtToken = apiAuthRec.getJwtToken().getValue();
         } catch (Exception e1) {
         }
+
         encryptedBase64Credentials = basicAuth;
-        // Check either JWT is generated or not.
+
+        // Check either JWT is generated or not/EXPIRED.
         if (myJwtToken == "") {
-            // Do it later
-        }
-
-        // GET API Call to Generate JWT Auth Token
-        String GET_URL_TP = "";
-        GET_URL_TP = "http://localhost:9089/irf-auth-token-generation-container-21.0.59/api/v1.0.0/generateauthtoken";
-        StringBuilder jwtResponse = null;
-        jwtResponse = this.makeGetRequest(GET_URL_TP);
-
-        try {
-            String trimmedResponse = jwtResponse.toString().replaceAll("^\"|\"$", "").replace("\\", "");
-            JSONObject jsonResponse = new JSONObject(trimmedResponse);
-
-            // Extract the token value
-            String token = "";
-            if (jsonResponse.has("id_token")) {
-                token = jsonResponse.getString("id_token");
-            } else {
-                System.out.println("Error: id_token is not found in JSON response");
-            }
-
-            // Tracer
-            try (FileWriter fw = new FileWriter("/Temenos/T24/UD/Tracer/DECRYPT-" + currentRecordId + ".txt", true);
-                    BufferedWriter bw = new BufferedWriter(fw);
-                    PrintWriter out = new PrintWriter(bw)) {
-                out.println(" token: " + token + "\n");
-            } catch (IOException e) {
-            }
-            // Tracer END
-
-            // Write the JWT Token in EB.JBL.API.AUTH.TABLE Template...
-            EbJblApiAuthTableTable apiAuthTable = new EbJblApiAuthTableTable(this);
-            apiAuthRec.setJwtToken(token);
+            // GET API Call to Generate JWT Auth Token
+            String GET_URL_TP = "";
+            GET_URL_TP = "http://localhost:9089/irf-auth-token-generation-container-21.0.59/api/v1.0.0/generateauthtoken";
+            StringBuilder jwtResponse = null;
+            jwtResponse = this.makeGetRequestForJWT(GET_URL_TP);
 
             try {
-                apiAuthTable.write(id, apiAuthRec);
-            } catch (T24IOException e) {
+                String trimmedResponse = jwtResponse.toString().replaceAll("^\"|\"$", "").replace("\\", "");
+                JSONObject jsonResponse = new JSONObject(trimmedResponse);
+
+                // Extract the token value
+                String token = "";
+                if (jsonResponse.has("id_token")) {
+                    token = jsonResponse.getString("id_token");
+                } else {
+                    System.out.println("Error: id_token is not found in JSON response");
+                }
+
+                // Tracer
+                try (FileWriter fw = new FileWriter("/Temenos/T24/UD/Tracer/DECRYPT-" + currentRecordId + ".txt", true);
+                        BufferedWriter bw = new BufferedWriter(fw);
+                        PrintWriter out = new PrintWriter(bw)) {
+                    out.println(" token: " + token + "\n");
+                } catch (IOException e) {
+                }
+                // Tracer END
+
+                // Write the JWT Token in EB.JBL.API.AUTH.TABLE Template...
+                EbJblApiAuthTableTable apiAuthTable = new EbJblApiAuthTableTable(this);
+                apiAuthRec.setJwtToken(token);
+
+                try {
+                    apiAuthTable.write(id, apiAuthRec);
+                } catch (T24IOException e) {
+                }
+            } catch (Exception e) {
+                System.out.println("Error occurred while extracting token: " + e.getMessage());
             }
-        } catch (Exception e) {
-            System.out.println("Error occurred while extracting token: " + e.getMessage());
+            // JWT Token Done
         }
-        // JWT Token Done
 
-        // CALL another API and pass the JWT Token
+        // Calling the MAIN API - GET Method - makeGetRequestForAML
+        String GET_URL_TP = "";
+        GET_URL_TP = "http://localhost:9089/CusJwtContainer/api/v1.0.0/party/ws/800155";
+        StringBuilder amlResponse = null;
+        amlResponse = this.makeGetRequestForAML(GET_URL_TP);
 
-        recordForCustomer.setAmlCheck("SENT");
+        // Tracer
+        try (FileWriter fw = new FileWriter("/Temenos/T24/UD/Tracer/DECRYPT-" + currentRecordId + ".txt", true);
+                BufferedWriter bw = new BufferedWriter(fw);
+                PrintWriter out = new PrintWriter(bw)) {
+            out.println("AmlResponse: " + amlResponse + "\n");
+        } catch (IOException e) {
+        }
+        // Tracer END
+
+        JSONObject jsonAml = null;
+
+        try {
+            jsonAml = new JSONObject(amlResponse.toString());
+        } catch (JSONException e) {
+        }
+
+        try {
+            if (jsonAml.getJSONObject("header").get("status").toString().equals("success")) {
+                recordForCustomer.setAmlCheck("SENT");
+            }
+            
+            else
+            {
+             // EMPTY the EXPIRED JWT Token in EB.JBL.API.AUTH.TABLE Template...
+                String token = "";
+                EbJblApiAuthTableTable apiAuthTable = new EbJblApiAuthTableTable(this);
+                apiAuthRec.setJwtToken(token);
+
+                try {
+                    apiAuthTable.write(id, apiAuthRec);
+                } catch (T24IOException e) {
+                }
+            }
+
+        } catch (JSONException e) {
+        }
         currentRecord.set(recordForCustomer.toStructure());
     }
     // END of MAIN Method
@@ -121,7 +162,7 @@ public class GbJblICusAML extends RecordLifecycle {
     } // END of AES decryption method
 
     // Method for API Call - GET Method -- JWT Token Generation
-    public StringBuilder makeGetRequest(String GET_URL) {
+    public StringBuilder makeGetRequestForJWT(String GET_URL) {
         StringBuilder response = new StringBuilder();
         HttpURLConnection con = null;
 
@@ -177,6 +218,55 @@ public class GbJblICusAML extends RecordLifecycle {
             e.printStackTrace();
         }
         return response;
-    }
+    } // END of GET Method -- JWT Token Generation
+
+    // Main API -- GET Request
+    public StringBuilder makeGetRequestForAML(String GET_URL) {
+        StringBuilder response = new StringBuilder();
+        HttpURLConnection con = null;
+
+        try {
+            URL url = new URL(GET_URL);
+            con = (HttpURLConnection) url.openConnection();
+            con.setRequestMethod("GET");
+            con.setRequestProperty("Content-Type", "application/json");
+
+            con.setRequestProperty("Authorization", myJwtToken);
+            con.setDoOutput(true);
+            con.setConnectTimeout(5000); // Set connection timeout to 5 seconds
+            con.setReadTimeout(5000); // Set read timeout to 5 seconds
+
+            int responseCode = con.getResponseCode();
+            try {
+                if (responseCode == HttpURLConnection.HTTP_OK) {
+                    try (BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()))) {
+                        String responseLine;
+                        while ((responseLine = br.readLine()) != null) {
+                            response.append(responseLine.trim());
+                        }
+
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    try (BufferedReader br = new BufferedReader(new InputStreamReader(con.getErrorStream()))) {
+                        String responseLine;
+                        while ((responseLine = br.readLine()) != null) {
+                            response.append(responseLine.trim());
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            } catch (Exception e) {
+                System.out.println("Rest call encountered an error");
+            }
+            con.disconnect();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return response;
+    } // END of GET Method -- MAIN API
 
 }
