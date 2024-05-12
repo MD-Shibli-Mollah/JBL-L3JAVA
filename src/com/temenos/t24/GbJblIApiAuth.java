@@ -12,9 +12,9 @@ import com.temenos.t24.api.hook.system.RecordLifecycle;
 import com.temenos.t24.api.tables.ebjblapiauthtable.EbJblApiAuthTableRecord;
 
 /**
- * TODO: Encryption for BASIC Auth
- *       Attached to - EB.JBL.API.AUTH.TABLE,
- *       EB.API - GbJblIApiAuth
+ * TODO: Encryption for BASIC Auth Attached to - EB.JBL.API.AUTH.TABLE, EB.API -
+ * GbJblIApiAuth
+ * 
  * @author MD Shibli Mollah
  * 
  */
@@ -53,12 +53,14 @@ public class GbJblIApiAuth extends RecordLifecycle {
             // encryptionKey);
             basicAuth = this.encryptCredentials(encodedAuthString, encryptionKey);
             // Tracer
-            /*try (FileWriter fw = new FileWriter("/Temenos/T24/UD/Tracer/ENCRYPT-" + currentRecordId + ".txt", true);
-                    BufferedWriter bw = new BufferedWriter(fw);
-                    PrintWriter out = new PrintWriter(bw)) {
-                out.println("MyAPI- encodedAuthString: " + encodedAuthString + "\n" + "Basic Auth: " + basicAuth);
-            } catch (IOException e) {
-            }*/
+            /*
+             * try (FileWriter fw = new
+             * FileWriter("/Temenos/T24/UD/Tracer/ENCRYPT-" + currentRecordId +
+             * ".txt", true); BufferedWriter bw = new BufferedWriter(fw);
+             * PrintWriter out = new PrintWriter(bw)) {
+             * out.println("MyAPI- encodedAuthString: " + encodedAuthString +
+             * "\n" + "Basic Auth: " + basicAuth); } catch (IOException e) { }
+             */
             // Tracer end
         } catch (Exception e) {
         }
@@ -68,7 +70,6 @@ public class GbJblIApiAuth extends RecordLifecycle {
         apiAuthRec.setPassword("");
 
         currentRecord.set(apiAuthRec.toStructure());
-
         return apiAuthRec.getValidationResponse();
     }
 

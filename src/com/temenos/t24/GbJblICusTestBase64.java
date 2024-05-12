@@ -44,9 +44,14 @@ public class GbJblICusTestBase64 extends RecordLifecycle {
 
         DataAccess da = new DataAccess(this);
         CustomerRecord recordForCustomer = new CustomerRecord(currentRecord);
+        
+        // test record set
+        recordForCustomer.setCustBirthCity("Bangladesh");
+        recordForCustomer.setSector("1002");
 
         String id = "";
-        id = "AML";
+       // id = "AML";
+        id = "EKYC";
         EbJblApiAuthTableRecord apiAuthRec = new EbJblApiAuthTableRecord(da.getRecord("EB.JBL.API.AUTH.TABLE", id));
 
         String basicAuth = "";
@@ -61,15 +66,6 @@ public class GbJblICusTestBase64 extends RecordLifecycle {
         // Decrypt
         String encryptedBase64Credentials = basicAuth;
         decryptedBase64 = decrypt(encryptedBase64Credentials, decryptionKey);
-        
-     // Tracer
-        try (FileWriter fw = new FileWriter("/Temenos/T24/UD/Tracer/DECRYPT-" + currentRecordId + ".txt", true);
-                BufferedWriter bw = new BufferedWriter(fw);
-                PrintWriter out = new PrintWriter(bw)) {
-            out.println("decryptedBase64: " + decryptedBase64 + "\n");
-        } catch (IOException e) {
-        }
-        // Tracer END
 
         // API Call
         // String POST_URL_TP = "";
@@ -129,9 +125,11 @@ public class GbJblICusTestBase64 extends RecordLifecycle {
             System.out.println("Error occurred while extracting token: " + e.getMessage());
         }
         recordForCustomer.setAmlCheck("SENT");
-        recordForCustomer.toStructure(); // MUST Require to update in T24
+        // MUST Require to update in T24
+        currentRecord.set(recordForCustomer.toStructure());
         return recordForCustomer.getValidationResponse();
     }
+    //END of MAIN Method
 
     // AES decryption method
     public static String decrypt(String strToDecrypt, String secret) {
@@ -197,40 +195,4 @@ public class GbJblICusTestBase64 extends RecordLifecycle {
         return response;
     }
 
-    // Method for API Call - POST Method
-    /*
-     * public StringBuilder makeRestCall(String POST_URL, String POST_PARAMS) {
-     * StringBuilder response = new StringBuilder(); HttpURLConnection con =
-     * null; try { URL url = new URL(POST_URL); con = (HttpURLConnection)
-     * url.openConnection(); con.setRequestMethod("POST");
-     * con.setRequestProperty("Content-Type", "application/json"); //
-     * con.setRequestProperty("Authorization", "Basic SU5QVVRUOjEyMzQ1Ng==");
-     * String basicAuth = "Basic " + decryptedBase64;
-     * con.setRequestProperty("Authorization", basicAuth);
-     * con.setDoOutput(true); try { OutputStream os = con.getOutputStream();
-     * byte[] input = POST_PARAMS.getBytes(StandardCharsets.UTF_8);
-     * os.write(input, 0, input.length); System.out.println(con);
-     * System.out.println("Waiting for REST call response"); try {
-     * Thread.sleep(3000); if (!(con.getResponseCode() ==
-     * HttpURLConnection.HTTP_OK)) { Thread.sleep(2000); } } catch
-     * (InterruptedException e) { System.out.println("Rest Call Falied"); } }
-     * catch (IOException e) {
-     * System.out.println("Connection establish failed"); System.exit(0); }
-     * 
-     * try { if (con.getResponseCode() == HttpURLConnection.HTTP_OK) { try
-     * (BufferedReader br = new BufferedReader(new
-     * InputStreamReader(con.getInputStream()))) { String responseLine; while
-     * ((responseLine = br.readLine()) != null) {
-     * response.append(responseLine.trim()); }
-     * 
-     * } catch (IOException e) { e.printStackTrace(); } } else { try
-     * (BufferedReader br = new BufferedReader(new
-     * InputStreamReader(con.getErrorStream()))) { String responseLine; while
-     * ((responseLine = br.readLine()) != null) {
-     * response.append(responseLine.trim()); } } catch (Exception e) {
-     * e.printStackTrace(); } } } catch (Exception e) {
-     * System.out.println("Rest call encountered an error"); } con.disconnect();
-     * 
-     * } catch (IOException e) { e.printStackTrace(); } return response; }
-     */
 }
