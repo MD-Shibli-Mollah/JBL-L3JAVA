@@ -106,6 +106,14 @@ public class GbJblICusAML extends RecordLifecycle {
         GET_URL_TP = "http://localhost:9089/CusJwtContainer/api/v1.0.0/party/ws/800155";
         StringBuilder amlResponse = null;
         amlResponse = this.makeGetRequestForAML(GET_URL_TP);
+        
+        try {
+            // Sleep for 6 seconds (6000 milliseconds)
+            Thread.sleep(6000);
+        } catch (InterruptedException e) {
+            // Handle interrupted exception if necessary
+            e.printStackTrace();
+        }
 
         // Tracer
         try (FileWriter fw = new FileWriter("/Temenos/T24/UD/Tracer/DECRYPT-" + currentRecordId + ".txt", true);
