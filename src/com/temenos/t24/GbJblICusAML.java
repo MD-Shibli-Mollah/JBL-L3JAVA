@@ -117,7 +117,6 @@ public class GbJblICusAML extends RecordLifecycle {
         // Tracer END
 
         JSONObject jsonAml = null;
-
         try {
             jsonAml = new JSONObject(amlResponse.toString());
         } catch (JSONException e) {
@@ -127,10 +126,10 @@ public class GbJblICusAML extends RecordLifecycle {
             if (jsonAml.getJSONObject("header").get("status").toString().equals("success")) {
                 recordForCustomer.setAmlCheck("SENT");
             }
-            
-            else
-            {
-             // EMPTY the EXPIRED JWT Token in EB.JBL.API.AUTH.TABLE Template...
+
+            else {
+                // EMPTY the EXPIRED JWT Token in EB.JBL.API.AUTH.TABLE
+                // Template...
                 String token = "";
                 EbJblApiAuthTableTable apiAuthTable = new EbJblApiAuthTableTable(this);
                 apiAuthRec.setJwtToken(token);
