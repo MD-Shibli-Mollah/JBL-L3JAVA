@@ -27,9 +27,9 @@ import com.temenos.t24.api.tables.ebjblapiauthtable.EbJblApiAuthTableRecord;
 import com.temenos.t24.api.tables.ebjblapiauthtable.EbJblApiAuthTableTable;
 
 /**
- * TODO: Document me!
- *
- * @author nazihar
+ * TODO: Decrypt the encrypted Basic Auth and then pass it to generate the JWT Token. 
+ *       Using JWT Token for Authorization and consume the API.
+ * @author MD Shibli Mollah
  *
  */
 public class GbJblICusAML extends RecordLifecycle {
