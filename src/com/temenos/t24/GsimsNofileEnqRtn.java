@@ -31,6 +31,7 @@ public class GsimsNofileEnqRtn extends Enquiry {
         String bdMobile = "";
         String abroadMobile = "";
         // String idType2 = "";
+        String cusLegalIdNameAll = "";
         String cusLegalIdName = "";
         // String documentId2 = "";
         String cusLegalIdNo = "";
@@ -65,14 +66,18 @@ public class GsimsNofileEnqRtn extends Enquiry {
         if (cusId != "") {
             CategoryRecord catRec = new CategoryRecord(daCat.getRecord("CATEGORY", category));
             CustomerRecord cusRec = new CustomerRecord(daCus.getRecord("CUSTOMER", cusId));
-            cusLegalIdName = cusRec.getLegalIdDocName(0).getValue();
-            cusLegalIdNo = cusRec.getLegalId(0).getLegalId().getValue();
+            cusLegalIdNameAll = cusRec.getLegalIdDocName(0).getValue(); // 1946718499-NATIONAL.ID
+            // Find the index of the hyphen
+            int hyphenIndex = cusLegalIdNameAll.indexOf("-");
+            // Extract the substring after the hyphen
+            cusLegalIdName = cusLegalIdNameAll.substring(hyphenIndex + 1);
             
+            cusLegalIdNo = cusRec.getLegalId(0).getLegalId().getValue();
 
             if (idType.equals(cusLegalIdName) && documentId.equals(cusLegalIdNo)) {
-                responseCode = "Success";               
+                responseCode = "Success";
                 accountType = catRec.getDescription(0).getValue();
-         
+
                 email = cusRec.getPhone1(0).getEmail1().getValue();
                 bdMobile = cusRec.getPhone1(0).getPhone1().getValue();
                 abroadMobile = cusRec.getPhone1(0).getSms1().getValue();
@@ -81,7 +86,7 @@ public class GsimsNofileEnqRtn extends Enquiry {
                 responseCode = "7"; // If id doc mismatch, response code is 7
             }
         } else {
-            responseCode = "6"; // If account is not found, response code is 6 
+            responseCode = "6"; // If account is not found, response code is 6
         }
 
         returnIds.add(responseCode + "*" + accountType + "*" + accountNo + "*" + accountTitle + "*" + email + "*"
