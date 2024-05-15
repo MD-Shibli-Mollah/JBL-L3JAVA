@@ -3,7 +3,6 @@ package com.temenos.t24;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.temenos.api.TField;
 import com.temenos.t24.api.complex.eb.enquiryhook.EnquiryContext;
 import com.temenos.t24.api.complex.eb.enquiryhook.FilterCriteria;
 import com.temenos.t24.api.hook.system.Enquiry;
@@ -32,8 +31,6 @@ public class GsimsNofileEnqRtn extends Enquiry {
         String email = "";
         String bdMobile = "";
         String abroadMobile = "";
-
-        String cusLegalIdNameAll = "";
         String cusLegalIdName = "";
 
         String cusLegalIdNo = "";
@@ -68,10 +65,6 @@ public class GsimsNofileEnqRtn extends Enquiry {
 
         try {
             accRec = new AccountRecord(daAcc.getRecord("ACCOUNT", accountNo));
-            // idType2 =
-            // accRec.getLocalRefField("LT.AC.ID.TYPE").getValue();
-            // documentId2 =
-            // accRec.getLocalRefField("LT.AC.ID.NO").getValue();
             category = accRec.getCategory().getValue();
             cusId = accRec.getCustomer().getValue();
             accountTitle = accRec.getAccountTitle1(0).getValue();
@@ -80,27 +73,32 @@ public class GsimsNofileEnqRtn extends Enquiry {
                 CategoryRecord catRec = new CategoryRecord(daCat.getRecord("CATEGORY", category));
                 CustomerRecord cusRec = new CustomerRecord(daCus.getRecord("CUSTOMER", cusId));
 
-                // List operation for LEGAL ID
-                List<TField> legalDocList = null;
-
-                String myLegalIdDocNameAndId = documentId + "-" + idType;
-                legalDocList = cusRec.getLegalIdDocName();
-                int legalIdDocIndex = 0;
-                legalIdDocIndex = legalDocList.indexOf(myLegalIdDocNameAndId);
-
+                // List operation for LEGAL ID - NATIONAL.ID , PASSPORT ,
+                // BIRTH.CERTIFICATE , DRIVING.LICENSE
                 List<LegalIdClass> legalIdList = null;
                 legalIdList = cusRec.getLegalId();
-                int legalIdIndex = 0;
-                legalIdIndex = legalIdList.indexOf(idType);
+
+                for (int i = 0; i < legalIdList.size(); i++) {
+                    LegalIdClass item = legalIdList.get(i);
+                    // idType = "NATIONAL.ID"
+                    if (idType.equals(item.getLegalDocName().getValue())) {
+                        cusLegalIdName = item.getLegalDocName().getValue();
+                        cusLegalIdNo = item.getLegalId().getValue();
+                        // index = i; // Found the index
+                        break;
+                    }
+                }
 
                 // NATIONAL.ID , PASSPORT , BIRTH.CERTIFICATE , DRIVING.LICENSE
-                cusLegalIdNameAll = cusRec.getLegalIdDocName(0).getValue(); // 1946718499-NATIONAL.ID
+                // cusLegalIdNameAll = cusRec.getLegalIdDocName(0).getValue();
+                // // 2341567899-NATIONAL.ID
                 // Find the index of the hyphen
-                int hyphenIndex = cusLegalIdNameAll.indexOf("-");
+                // int hyphenIndex = cusLegalIdNameAll.indexOf("-");
                 // Extract the substring after the hyphen
-                cusLegalIdName = cusLegalIdNameAll.substring(hyphenIndex + 1);
+                // cusLegalIdName = cusLegalIdNameAll.substring(hyphenIndex +
+                // 1);
 
-                cusLegalIdNo = cusRec.getLegalId(0).getLegalId().getValue();
+                // cusLegalIdNo = cusRec.getLegalId(0).getLegalId().getValue();
 
                 if (idType.equals(cusLegalIdName) && documentId.equals(cusLegalIdNo)) {
                     responseCode = "Success";
