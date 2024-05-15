@@ -47,11 +47,11 @@ public class GsimsNofileEnqRtn extends Enquiry {
             accountNo = filterCriteria.get(0).getValue();
             idType = filterCriteria.get(1).getValue(); // Only NID/PP/BID/DL
 
-            if (idType == "NID") {
+            if ("NID".equals(idType)) {
                 idType = "NATIONAL.ID";
-            } else if (idType == "PP") {
+            } else if ("PP".equals(idType)) {
                 idType = "PASSPORT";
-            } else if (idType == "BID") {
+            } else if ("BID".equals(idType)) {
                 idType = "BIRTH.CERTIFICATE";
             } else {
                 idType = "DRIVING.LICENSE";
@@ -82,10 +82,17 @@ public class GsimsNofileEnqRtn extends Enquiry {
 
                 // List operation for LEGAL ID
                 List<TField> legalDocList = null;
+
+                String myLegalIdDocNameAndId = documentId + "-" + idType;
                 legalDocList = cusRec.getLegalIdDocName();
+                int legalIdDocIndex = 0;
+                legalIdDocIndex = legalDocList.indexOf(myLegalIdDocNameAndId);
+
                 List<LegalIdClass> legalIdList = null;
                 legalIdList = cusRec.getLegalId();
-                
+                int legalIdIndex = 0;
+                legalIdIndex = legalIdList.indexOf(idType);
+
                 // NATIONAL.ID , PASSPORT , BIRTH.CERTIFICATE , DRIVING.LICENSE
                 cusLegalIdNameAll = cusRec.getLegalIdDocName(0).getValue(); // 1946718499-NATIONAL.ID
                 // Find the index of the hyphen
