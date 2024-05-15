@@ -89,17 +89,6 @@ public class GsimsNofileEnqRtn extends Enquiry {
                     }
                 }
 
-                // NATIONAL.ID , PASSPORT , BIRTH.CERTIFICATE , DRIVING.LICENSE
-                // cusLegalIdNameAll = cusRec.getLegalIdDocName(0).getValue();
-                // // 2341567899-NATIONAL.ID
-                // Find the index of the hyphen
-                // int hyphenIndex = cusLegalIdNameAll.indexOf("-");
-                // Extract the substring after the hyphen
-                // cusLegalIdName = cusLegalIdNameAll.substring(hyphenIndex +
-                // 1);
-
-                // cusLegalIdNo = cusRec.getLegalId(0).getLegalId().getValue();
-
                 if (idType.equals(cusLegalIdName) && documentId.equals(cusLegalIdNo)) {
                     responseCode = "Success";
                     accountType = catRec.getDescription(0).getValue();
