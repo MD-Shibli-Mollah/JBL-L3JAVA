@@ -76,11 +76,9 @@ public class NofileEnqStmtNtr extends Enquiry {
 
         stmtRecords = da.getConcatValues("STMT.PRINTED", stmtPrintedId);
         // Reversing the stmtRecords List
-        Collections.reverse(stmtRecords);
-        
-        List<String> testList = stmtRecords;
-        String testId = testList.get(0);
-        
+        Collections.reverse(stmtRecords);        
+       // List<String> testList = stmtRecords;
+       // String testId = testList.get(0);
         stmtRecCount = stmtRecords.size();
 
         if (stmtRecCount > myselNtr) {
