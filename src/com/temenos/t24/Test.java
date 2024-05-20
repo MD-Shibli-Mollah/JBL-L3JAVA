@@ -109,6 +109,8 @@ public class Test {
             String date = parts[0];
         }
        String stmtDate = input.substring(0, input.indexOf('/'));
+    // Get a sublist of the last 10 IDs
+       // List<String> lastTenIds = ids.subList(ids.size() - 10, ids.size());
     }
 
 }

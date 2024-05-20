@@ -3,6 +3,7 @@ package com.temenos.t24;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 // import com.temenos.api.TDate;
@@ -20,8 +21,7 @@ import com.temenos.t24.api.system.DataAccess;
 
 /**
  * TODO: API for account statement for TOP N transactions
- * EB.API>NOF.NofileEnqStmtNtr
- * STANDARD.SELECTION>NOFILE.JBL.PSOPSP.STMT.NTR
+ * EB.API>NOF.NofileEnqStmtNtr STANDARD.SELECTION>NOFILE.JBL.PSOPSP.STMT.NTR
  * ENQUIRY>AC.API.JBL.PSOPSP.STMT.N.1.0.0
  *
  * @author MD Shibli Mollah
@@ -35,13 +35,7 @@ public class NofileEnqStmtNtr extends Enquiry {
         // TODO Auto-generated method stub
         // Init Variables
         String selAccountNo = "";
-        /*
-         * String selFromDate = ""; String selToDate = "";
-         */
         String selNtr = "";
-        /*
-         * LocalDate fromDate = null; LocalDate toDate = null;
-         */
         LocalDate txnDate = null;
 
         String txnReference = "";
@@ -72,15 +66,6 @@ public class NofileEnqStmtNtr extends Enquiry {
         Account account = new Account(this);
         account.setAccountId(selAccountNo);
 
-        // List<String> stmtRecords = account.getEntries("BOOK", "", "", "",
-        // startDate, endDate);
-        // List<String>
-        // com.temenos.t24.api.system.DataAccess.selectRecords(String
-        // companyMnemonic, String tableName, String fileSuffix, String
-        // filterAndSort)
-        // List<String> stmtRecords = da.selectRecords("BNK", "STMT.PRINTED",
-        // "", "WITH @ID LK "+ testAc +"...");
-
         AcctStmtPrintRecord acctStmtPrintRecord = new AcctStmtPrintRecord(
                 da.getRecord("ACCT.STMT.PRINT", selAccountNo));
         acStmtDateBal = acctStmtPrintRecord.getStmtDateBal().getValue(); // 20210430/0
@@ -89,18 +74,25 @@ public class NofileEnqStmtNtr extends Enquiry {
 
         stmtPrintedId = selAccountNo + "-" + stmtDate; // 100000000088-20220602
 
-        // List<String> stmtPrintedRecord = (List<String>) new
-        // StmtPrintedRecord((T24Context) da.getConcatValues("STMT.PRINTED",
-        // stmtPrintedId));
-        // StmtPrintedRecord stmtPrintedRecord = new
-        // StmtPrintedRecord(da.getConcatValues("STMT.PRINTED", stmtPrintedId));
         stmtRecords = da.getConcatValues("STMT.PRINTED", stmtPrintedId);
         stmtRecCount = stmtRecords.size();
 
         if (stmtRecCount > myselNtr) {
             stmtRecCountExtra = stmtRecCount - myselNtr;
             stmtRecCount = stmtRecCount - stmtRecCountExtra;
-            topNStmtIds = stmtRecords.subList(0, stmtRecCount);
+            // Get a sublist of the last 10 IDs
+            // List<String> lastTenIds = ids.subList(ids.size() - 10,ids.size());
+            topNStmtIds = stmtRecords.subList(stmtRecCount - myselNtr, stmtRecCount);
+            Collections.reverse(topNStmtIds);
+        }
+
+        else if (stmtRecCount == myselNtr) {
+            topNStmtIds = stmtRecords.subList(stmtRecCount - myselNtr, stmtRecCount);
+            Collections.reverse(topNStmtIds);
+        }
+
+        else {
+
         }
 
         FundsTransferRecord ftRec = null;
@@ -173,4 +165,3 @@ public class NofileEnqStmtNtr extends Enquiry {
         return retStmtInfo;
     }
 }
-
