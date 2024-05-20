@@ -11,6 +11,8 @@ import java.util.Map;
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
+import com.temenos.t24.api.records.customer.LegalIdClass;
+
 /**
  * TODO: Document me!
  *
@@ -87,6 +89,26 @@ public class Test {
         nofValueMapping.put("isSalaryPaid", "false");
         String nofStr = nofValueMapping.toString();*/
         
+        // Read Multi value field & position.
+        /*for (int i = 0; i < legalIdList.size(); i++) {
+            LegalIdClass item = legalIdList.get(i);
+            // idType = "NATIONAL.ID"
+            if (idType.equals(item.getLegalDocName().getValue())) {
+                cusLegalIdName = item.getLegalDocName().getValue();
+                cusLegalIdNo = item.getLegalId().getValue();
+                // index = i; // Found the index
+                break;
+            }
+        }*/
+// SELECT any application      
+// List<String> com.temenos.t24.api.system.DataAccess.selectRecords(String companyMnemonic, String tableName, String fileSuffix, String filterAndSort)
+        String input = "20210430/0";
+        String[] parts = input.split("/");
+
+        if (parts.length > 0) {
+            String date = parts[0];
+        }
+       String stmtDate = input.substring(0, input.indexOf('/'));
     }
 
 }
