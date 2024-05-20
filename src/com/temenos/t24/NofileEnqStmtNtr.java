@@ -75,20 +75,23 @@ public class NofileEnqStmtNtr extends Enquiry {
         stmtPrintedId = selAccountNo + "-" + stmtDate; // 100000000088-20220602
 
         stmtRecords = da.getConcatValues("STMT.PRINTED", stmtPrintedId);
+        // Reversing the stmtRecords List
+        Collections.reverse(stmtRecords);
+        
+        List<String> testList = stmtRecords;
+        String testId = testList.get(0);
+        
         stmtRecCount = stmtRecords.size();
 
         if (stmtRecCount > myselNtr) {
             stmtRecCountExtra = stmtRecCount - myselNtr;
             stmtRecCount = stmtRecCount - stmtRecCountExtra;
-            // Get a sublist of the last 10 IDs
-            // List<String> lastTenIds = ids.subList(ids.size() - 10,ids.size());
-            topNStmtIds = stmtRecords.subList(stmtRecCount - myselNtr, stmtRecCount);
-            Collections.reverse(topNStmtIds);
+            // Get a sublist of the first 10 IDs
+            topNStmtIds = stmtRecords.subList(0, stmtRecCount);
         }
 
         else if (stmtRecCount == myselNtr) {
-            topNStmtIds = stmtRecords.subList(stmtRecCount - myselNtr, stmtRecCount);
-            Collections.reverse(topNStmtIds);
+            topNStmtIds = stmtRecords.subList(0, stmtRecCount);
         }
 
         else {
