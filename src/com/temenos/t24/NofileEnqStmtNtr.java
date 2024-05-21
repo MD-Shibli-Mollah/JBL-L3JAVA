@@ -54,7 +54,6 @@ public class NofileEnqStmtNtr extends Enquiry {
         int stmtRecCount = 0;
         List<String> stmtRecords = new ArrayList<String>();
         List<String> topNStmtIds = new ArrayList<String>();
-        int stmtRecCountExtra = 0;
 
         DataAccess da = new DataAccess(this);
         List<String> retStmtInfo = new ArrayList<String>();
@@ -76,24 +75,19 @@ public class NofileEnqStmtNtr extends Enquiry {
 
         stmtRecords = da.getConcatValues("STMT.PRINTED", stmtPrintedId);
         // Reversing the stmtRecords List
-        Collections.reverse(stmtRecords);        
-       // List<String> testList = stmtRecords;
-       // String testId = testList.get(0);
+        Collections.reverse(stmtRecords);
+        // List<String> testList = stmtRecords;
+        // String testId = testList.get(0);
         stmtRecCount = stmtRecords.size();
 
         if (stmtRecCount > myselNtr) {
-            stmtRecCountExtra = stmtRecCount - myselNtr;
-            stmtRecCount = stmtRecCount - stmtRecCountExtra;
+            stmtRecCount = myselNtr;
             // Get a sublist of the first 10 IDs
             topNStmtIds = stmtRecords.subList(0, stmtRecCount);
         }
 
-        else if (stmtRecCount == myselNtr) {
-            topNStmtIds = stmtRecords.subList(0, stmtRecCount);
-        }
-
         else {
-
+            topNStmtIds = stmtRecords.subList(0, stmtRecCount);
         }
 
         FundsTransferRecord ftRec = null;
