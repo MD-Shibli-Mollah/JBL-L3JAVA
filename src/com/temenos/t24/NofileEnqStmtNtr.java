@@ -38,16 +38,6 @@ public class NofileEnqStmtNtr extends Enquiry {
         String selNtr = "";
         LocalDate txnDate = null;
 
-        String txnReference = "";
-        String debitAccNo = "";
-        String debitBranchCode = "";
-        String ttTheirRef = "";
-        String creditAccNo = "";
-        String creditBranchCode = "";
-        String creditAccName = "";
-        String amount = "";
-        String txnNarrative = "";
-        String creditAcctCurrencyCode = "";
         String acStmtDateBal = "";
         String stmtDate = "";
         String stmtPrintedId = "";
@@ -101,6 +91,16 @@ public class NofileEnqStmtNtr extends Enquiry {
 
         retStmtInfo.add(record);
         for (String stmtId : topNStmtIds) {
+            String txnReference = "";
+            String debitAccNo = "";
+            String debitBranchCode = "";
+            String ttTheirRef = "";
+            String creditAccNo = "";
+            String creditBranchCode = "";
+            String creditAccName = "";
+            String amount = "";
+            String txnNarrative = "";
+            String creditAcctCurrencyCode = "";
             try {
                 StmtEntryRecord stmtRec = null;
                 stmtRec = new StmtEntryRecord(da.getRecord("STMT.ENTRY", stmtId));
@@ -109,6 +109,10 @@ public class NofileEnqStmtNtr extends Enquiry {
                     continue;
                 }
                 txnReference = stmtRec.getTransReference().getValue();
+
+                if ((txnReference == null) || (txnReference.equals(""))) {
+                    continue;
+                }
                 txnDate = LocalDate.parse(stmtRec.getBookingDate().getValue(), DateTimeFormatter.ofPattern("yyyyMMdd"));
 
                 String trtype = "eJanata";
@@ -149,11 +153,10 @@ public class NofileEnqStmtNtr extends Enquiry {
                 record = txnDate + "*" + txnReference + "*" + debitAccNo + "*" + debitBranchCode + "*" + creditAccNo
                         + "*" + creditBranchCode + "*" + creditAccName + "*" + amount + "*" + txnNarrative + "*"
                         + creditAcctCurrencyCode + "*" + trtype + "*" + " ";
+                retStmtInfo.add(record);
             } catch (Exception e) {
             }
-            retStmtInfo.add(record);
         }
-
         return retStmtInfo;
     }
 }

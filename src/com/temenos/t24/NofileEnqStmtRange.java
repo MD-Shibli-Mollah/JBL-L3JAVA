@@ -37,17 +37,6 @@ public class NofileEnqStmtRange extends Enquiry {
         LocalDate toDate = null;
         LocalDate txnDate = null;
 
-        String txnReference = "";
-        String debitAccNo = "";
-        String debitBranchCode = "";
-        String ttTheirRef = "";
-        String creditAccNo = "";
-        String creditBranchCode = "";
-        String creditAccName = "";
-        String amount = "";
-        String txnNarrative = "";
-        String creditAcctCurrencyCode = "";
-
         DataAccess da = new DataAccess(this);
         List<String> retStmtInfo = new ArrayList<String>();
         selAccountNo = filterCriteria.get(0).getValue();
@@ -80,44 +69,59 @@ public class NofileEnqStmtRange extends Enquiry {
                 + "*" + " " + "*" + " " + "*" + stmtRecords.size();
 
         retStmtInfo.add(record);
-        StmtEntryRecord stmtRec = null;
-        for (String stmtId : stmtRecords) {
-            try {
-                stmtRec = new StmtEntryRecord(da.getRecord("STMT.ENTRY", stmtId));
-                // String txnDateTime = stmtRec.getValueDate().getValue();
-                
-                txnReference = stmtRec.getTransReference().getValue();
-                txnDate = LocalDate.parse(stmtRec.getBookingDate().getValue(), DateTimeFormatter.ofPattern("yyyyMMdd"));
-            } catch (Exception e) {
-            }
-            String trtype = "eJanata";
-            if (txnReference.startsWith("FT")) {
-                ftRec = new FundsTransferRecord(da.getRecord("FUNDS.TRANSFER", txnReference));
-            } else {
-                if (txnReference.startsWith("TT")) {
-                    ttRec = new TellerRecord(da.getRecord("TELLER", txnReference));
-                    accRec = new AccountRecord(da.getRecord("ACCOUNT", ttRec.getAccount2().getValue()));
-                    ttTheirRef = stmtRec.getTheirReference().getValue();
-                    if (ttTheirRef.equals("") || ttTheirRef.equals(null)) {
-                        ttTheirRef = " ";
-                    }
-                    retStmtInfo.add(txnDate + "*" + txnReference + "*" + ttRec.getAccount2().getValue() + "*"
-                            + accRec.getCoCode() + "*" + ttRec.getAccount1(0).getAccount1().getValue() + "*"
-                            + ttRec.getCoCode() + "*" + accRec.getAccountTitle1().get(0).getValue() + "*"
-                            + stmtRec.getAmountLcy().getValue() + "*" + ttTheirRef + "*"
-                            + stmtRec.getCurrency().getValue() + "*" + trtype + "*" + " ");
-                }
-                continue;
-            }
-            debitAccNo = ftRec.getDebitAcctNo().getValue();
-            try {
-                accRec = new AccountRecord(da.getRecord("ACCOUNT", debitAccNo));
-            } catch (Exception e) {
-            }
-            debitBranchCode = accRec.getCoCode();
 
-            creditAccNo = ftRec.getCreditAcctNo().getValue();
+        for (String stmtId : stmtRecords) {
+            String txnReference = "";
+            String debitAccNo = "";
+            String debitBranchCode = "";
+            String ttTheirRef = "";
+            String creditAccNo = "";
+            String creditBranchCode = "";
+            String creditAccName = "";
+            String amount = "";
+            String txnNarrative = "";
+            String creditAcctCurrencyCode = "";
+            String stmtRecStatus = "";
             try {
+                StmtEntryRecord stmtRec = null;
+                stmtRec = new StmtEntryRecord(da.getRecord("STMT.ENTRY", stmtId));
+
+                stmtRecStatus = stmtRec.getRecordStatus();
+                if (stmtRecStatus.equals("REVE")) {
+                    continue;
+                }
+                txnReference = stmtRec.getTransReference().getValue();
+
+                if ((txnReference == null) || (txnReference.equals(""))) {
+                    continue;
+                }
+
+                txnDate = LocalDate.parse(stmtRec.getBookingDate().getValue(), DateTimeFormatter.ofPattern("yyyyMMdd"));
+                String trtype = "eJanata";
+                if (txnReference.startsWith("FT")) {
+                    ftRec = new FundsTransferRecord(da.getRecord("FUNDS.TRANSFER", txnReference));
+                } else {
+                    if (txnReference.startsWith("TT")) {
+                        ttRec = new TellerRecord(da.getRecord("TELLER", txnReference));
+                        accRec = new AccountRecord(da.getRecord("ACCOUNT", ttRec.getAccount2().getValue()));
+                        ttTheirRef = stmtRec.getTheirReference().getValue();
+                        if (ttTheirRef.equals("") || ttTheirRef.equals(null)) {
+                            ttTheirRef = " ";
+                        }
+                        retStmtInfo.add(txnDate + "*" + txnReference + "*" + ttRec.getAccount2().getValue() + "*"
+                                + accRec.getCoCode() + "*" + ttRec.getAccount1(0).getAccount1().getValue() + "*"
+                                + ttRec.getCoCode() + "*" + accRec.getAccountTitle1().get(0).getValue() + "*"
+                                + stmtRec.getAmountLcy().getValue() + "*" + ttTheirRef + "*"
+                                + stmtRec.getCurrency().getValue() + "*" + trtype + "*" + " ");
+                    }
+                    continue;
+                }
+                debitAccNo = ftRec.getDebitAcctNo().getValue();
+                accRec = new AccountRecord(da.getRecord("ACCOUNT", debitAccNo));
+
+                debitBranchCode = accRec.getCoCode();
+                creditAccNo = ftRec.getCreditAcctNo().getValue();
+
                 accRec = new AccountRecord(da.getRecord("ACCOUNT", creditAccNo));
                 creditBranchCode = accRec.getCoCode();
                 creditAccName = accRec.getAccountTitle1().get(0).getValue();
@@ -132,14 +136,10 @@ public class NofileEnqStmtRange extends Enquiry {
                 record = txnDate + "*" + txnReference + "*" + debitAccNo + "*" + debitBranchCode + "*" + creditAccNo
                         + "*" + creditBranchCode + "*" + creditAccName + "*" + amount + "*" + txnNarrative + "*"
                         + creditAcctCurrencyCode + "*" + trtype + "*" + " ";
+                retStmtInfo.add(record);
             } catch (Exception e) {
             }
-
-            retStmtInfo.add(record);
         }
-
         return retStmtInfo;
-
     }
-
 }
