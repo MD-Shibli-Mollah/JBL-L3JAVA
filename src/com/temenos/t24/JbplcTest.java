@@ -14,7 +14,7 @@ import com.temenos.t24.api.records.stmtentry.StmtEntryRecord;
 public class JbplcTest extends Enquiry {
     
 
-    AaPrdDesAccountRecord accountRecord = new AaPrdDesAccountRecord(record);
+    // AaPrdDesAccountRecord accountRecord = new AaPrdDesAccountRecord(record);
     StmtEntryRecord stmtentryRecord = new StmtEntryRecord(this);
 
 }

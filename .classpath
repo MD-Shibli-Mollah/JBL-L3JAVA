@@ -4,8 +4,8 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/t24lib"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/TAFJlib"/>
-	<classpathentry kind="lib" path="C:/Users/nazihar/OneDrive - Nazihar Group/Desktop/JBL_R22 2023-24/Template Jars/EBSmsTempaltes.jar"/>
-	<classpathentry kind="lib" path="C:/Users/nazihar/OneDrive - Nazihar Group/Desktop/JBL_R22 2023-24/Template Jars/json-20240303.jar"/>
 	<classpathentry kind="lib" path="C:/Users/nazihar/Downloads/JBL_API_AUTH-Tables.jar"/>
+	<classpathentry kind="lib" path="D:/Temenos/jboss/modules/com/temenos/t24/main/locallib/EBSmsTempaltes.jar"/>
+	<classpathentry kind="lib" path="D:/Temenos/jboss/modules/com/temenos/t24/main/locallib/json.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
