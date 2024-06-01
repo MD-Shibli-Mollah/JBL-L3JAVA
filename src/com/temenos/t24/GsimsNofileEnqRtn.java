@@ -109,6 +109,10 @@ public class GsimsNofileEnqRtn extends Enquiry {
             returnIds.add(responseCode + "*" + accountType + "*" + accountNo + "*" + accountTitle + "*" + email + "*"
                     + bdMobile + "*" + abroadMobile);
         } catch (Exception e) {
+        } finally {
+            responseCode = "6";
+            returnIds.add(responseCode + "*" + accountType + "*" + accountNo + "*" + accountTitle + "*" + email + "*"
+                    + bdMobile + "*" + abroadMobile);
         }
         return returnIds;
     }
