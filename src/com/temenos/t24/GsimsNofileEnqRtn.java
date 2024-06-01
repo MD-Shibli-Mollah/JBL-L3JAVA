@@ -25,7 +25,8 @@ public class GsimsNofileEnqRtn extends Enquiry {
 
         List<String> returnIds = new ArrayList<String>();
 
-        String responseCode = "6"; // If AC.NO is invalid then default code is 6.
+        String responseCode = "6"; // If AC.NO is invalid then default code is
+                                   // 6.
         String accountType = "";
         String accountTitle = "";
         String email = "";
@@ -105,9 +106,11 @@ public class GsimsNofileEnqRtn extends Enquiry {
                 responseCode = "6"; // If account is not found, response code is
                                     // 6
             }
-
-            returnIds.add(responseCode + "*" + accountType + "*" + accountNo + "*" + accountTitle + "*" + email + "*"
-                    + bdMobile + "*" + abroadMobile);
+            /*
+             * returnIds.add(responseCode + "*" + accountType + "*" + accountNo
+             * + "*" + accountTitle + "*" + email + "*" + bdMobile + "*" +
+             * abroadMobile);
+             */
         } catch (Exception e) {
         } finally {
             returnIds.add(responseCode + "*" + accountType + "*" + accountNo + "*" + accountTitle + "*" + email + "*"
