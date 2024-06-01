@@ -25,7 +25,7 @@ public class GsimsNofileEnqRtn extends Enquiry {
 
         List<String> returnIds = new ArrayList<String>();
 
-        String responseCode = "";
+        String responseCode = "6"; // If AC.NO is invalid then default code is 6.
         String accountType = "";
         String accountTitle = "";
         String email = "";
@@ -110,7 +110,6 @@ public class GsimsNofileEnqRtn extends Enquiry {
                     + bdMobile + "*" + abroadMobile);
         } catch (Exception e) {
         } finally {
-            responseCode = "6";
             returnIds.add(responseCode + "*" + accountType + "*" + accountNo + "*" + accountTitle + "*" + email + "*"
                     + bdMobile + "*" + abroadMobile);
         }
