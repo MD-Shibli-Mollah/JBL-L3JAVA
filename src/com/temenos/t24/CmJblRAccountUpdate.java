@@ -17,8 +17,12 @@ import com.temenos.t24.api.system.DataAccess;
  *
  * Developed by: Shafiul Azam
  * Updated by: MD Shibli Mollah
- *
- */
+ * Activity: LENDING-NEW-ARRANGEMENT
+ * Property : ACCOUNT
+ * Action: MAINTAIN
+ * RECORD ROUTINE - CmJblRAccountUpdate
+*/
+
 public class CmJblRAccountUpdate extends ActivityLifecycle {
 
     @Override
