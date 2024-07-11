@@ -68,7 +68,7 @@ public class ApNofileEnqTeacherSalary extends Enquiry {
         StmtEntryRecord stmtRec = null;
         for (String stmt : stmtRecords) {
             stmtRec = new StmtEntryRecord(da.getRecord("STMT.ENTRY", stmt));
-            if (Integer.parseInt(stmtRec.getTransactionCode().getValue()) == 213) {
+            if (Integer.parseInt(stmtRec.getTransactionCode().getValue()) == 2004) {
                 LocalDate salaryDate = LocalDate.parse(stmtRec.getValueDate().getValue(),
                         DateTimeFormatter.ofPattern("yyyyMMdd"));
                 if (salaryDate.getDayOfMonth() >= startDate.getDay()
