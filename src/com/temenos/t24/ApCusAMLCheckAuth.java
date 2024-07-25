@@ -15,10 +15,11 @@ public class ApCusAMLCheckAuth extends RecordLifecycle {
             List<TransactionData> transactionData, List<TStructure> currentRecords,
             TransactionContext transactionContext) {
        
-        String verName = transactionContext.getCurrentVersionId();
+       // String verName = transactionContext.getCurrentVersionId();
         String vfunc = transactionContext.getCurrentFunction();
 
-        if (((verName.equals(",AML"))) && ((vfunc.equals("AUTHORISE")))) {
+       // if (((verName.equals(",AML"))) && ((vfunc.equals("AUTHORISE")))) {
+        if (vfunc.equals("AUTHORISE")) {
 
             CustomerRecord cusRec = new CustomerRecord(currentRecord);
             String amlResult = cusRec.getAmlResult().getValue();
