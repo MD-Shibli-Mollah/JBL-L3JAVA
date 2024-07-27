@@ -1,5 +1,12 @@
 package com.temenos.t24;
 
+/*
+EB.API      : ApCusAMLCheckAuth
+Attached as : Auth Routine
+VERSION     : ALL CUSTOMER VERSION
+DEVELOPED BY: MD Shibli Mollah
+*/
+
 import java.util.List;
 
 import com.temenos.api.TStructure;

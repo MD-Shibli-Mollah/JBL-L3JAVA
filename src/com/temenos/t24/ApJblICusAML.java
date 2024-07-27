@@ -27,8 +27,10 @@ import com.temenos.t24.api.tables.ebjblapiauthtable.EbJblApiAuthTableRecord;
 import com.temenos.t24.api.tables.ebjblapiauthtable.EbJblApiAuthTableTable;
 
 /**
- * TODO: Decrypt the encrypted Basic Auth and then pass it to generate the JWT Token. 
- *       Using JWT Token for Authorization and consume the API.
+ * TODO: Decrypt the encrypted Basic Auth and then pass it to generate the JWT
+ * Token. Using JWT Token for Authorization and consume the API. TEMPLATE NAME:
+ * EB.JBL.API.AUTH.TABLE
+ * 
  * @author MD Shibli Mollah
  *
  */
@@ -44,10 +46,11 @@ public class ApJblICusAML extends RecordLifecycle {
         try {
             CustomerRecord recordForCustomer = new CustomerRecord(currentRecord);
 
-            String id = "";
-            id = "AML";
+            // JWT Token
+            String myTokenID = "";
+            myTokenID = "AML";
             DataAccess da = new DataAccess(this);
-            EbJblApiAuthTableRecord apiAuthRec = new EbJblApiAuthTableRecord(da.getRecord("EB.JBL.API.AUTH.TABLE", id));
+            EbJblApiAuthTableRecord apiAuthRec = new EbJblApiAuthTableRecord(da.getRecord("EB.JBL.API.AUTH.TABLE", myTokenID));
 
             String basicAuth = "";
             try {
@@ -91,7 +94,7 @@ public class ApJblICusAML extends RecordLifecycle {
                     apiAuthRec.setJwtToken(token);
 
                     try {
-                        apiAuthTable.write(id, apiAuthRec);
+                        apiAuthTable.write(myTokenID, apiAuthRec);
                     } catch (T24IOException e) {
                     }
                 } catch (Exception e) {
@@ -139,7 +142,7 @@ public class ApJblICusAML extends RecordLifecycle {
                     apiAuthRec.setJwtToken(token);
 
                     try {
-                        apiAuthTable.write(id, apiAuthRec);
+                        apiAuthTable.write(myTokenID, apiAuthRec);
                     } catch (T24IOException e) {
                     }
                 }
