@@ -1,7 +1,7 @@
 package com.temenos.t24;
 
 /*
-EB.API      : JblCusAmlConsumeAPIService, JblCusAmlConsumeAPIService.SELECT
+EB.API      : ApJblCusAmlConsumeAPIService, ApJblCusAmlConsumeAPIService.SELECT
 PGM.FILE    : JblCusAmlConsumeAPIService
 BATCH       : BNK/CUS.AML.SERVICE
 TSA.SERVICE : BNK/CUS.AML.SERVICE
@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -48,7 +49,9 @@ public class ApJblCusAmlConsumeAPIService extends ServiceLifecycle {
     public List<String> getIds(ServiceData serviceData, List<String> controlList) {
 
         DataAccess da = new DataAccess(this);
-        List<String> recordIDs = da.selectRecords("", "CUSTOMER", "$NAU", "WITH AML.RESULT EQ NULL");
+        List<String> recordIDs = da.selectRecords("", "CUSTOMER", "$NAU",
+                "WITH AML.RESULT EQ NULL AND RECORD.STATUS EQ INAU");
+       // System.out.println("Record ID's Are: " + recordIDs);
         int cnt = recordIDs.size();
         System.out.println(cnt + " Are Selected");
 
@@ -63,16 +66,20 @@ public class ApJblCusAmlConsumeAPIService extends ServiceLifecycle {
         DataAccess da = new DataAccess(this);
         CustomerRecord cusRec = new CustomerRecord(da.getRecord("", "CUSTOMER", "$NAU", id));
 
+        System.out.println("Customer Record ID is: " + id);
         // JWT Token
         String myTokenID = "";
         myTokenID = "AML";
 
-        EbJblApiAuthTableRecord apiAuthRec = new EbJblApiAuthTableRecord(da.getRecord("EB.JBL.API.AUTH.TABLE", myTokenID));
+        EbJblApiAuthTableRecord apiAuthRec = new EbJblApiAuthTableRecord(
+                da.getRecord("EB.JBL.API.AUTH.TABLE", myTokenID));
 
         String basicAuth = "";
         try {
             basicAuth = apiAuthRec.getBasicAuth().getValue();
             myJwtToken = apiAuthRec.getJwtToken().getValue();
+            System.out.println("basicAuth Token is: " + basicAuth);
+            System.out.println("JWT Token is: " + myJwtToken);
         } catch (Exception e1) {
         }
 
@@ -81,88 +88,90 @@ public class ApJblCusAmlConsumeAPIService extends ServiceLifecycle {
         // Check either JWT is generated or not/EXPIRED.
         if (myJwtToken == "") {
             // GET API Call to Generate JWT Auth Token
-            String GET_URL_TP = "";
-            GET_URL_TP = "http://localhost:9089/irf-auth-token-generation-container-21.0.59/api/v1.0.0/generateauthtoken";
-            StringBuilder jwtResponse = null;
-            jwtResponse = this.makeGetRequestForJWT(GET_URL_TP);
-
-            try {
-                String trimmedResponse = jwtResponse.toString().replaceAll("^\"|\"$", "").replace("\\", "");
-                JSONObject jsonResponse = new JSONObject(trimmedResponse);
-
-                // Extract the token value
-                String token = "";
-                if (jsonResponse.has("id_token")) {
-                    token = jsonResponse.getString("id_token");
-                } else {
-                    System.out.println("Error: id_token is not found in JSON response");
-                }
-
-                // Write the JWT Token in EB.JBL.API.AUTH.TABLE Template...
-                EbJblApiAuthTableTable apiAuthTable = new EbJblApiAuthTableTable(this);
-                apiAuthRec.setJwtToken(token);
+                String GET_URL_TP = "";
+                GET_URL_TP = "http://localhost:9089/irf-auth-token-generation-container-21.0.59/api/v1.0.0/generateauthtoken";
+                StringBuilder jwtResponse = null;
+                jwtResponse = this.makeGetRequestForJWT(GET_URL_TP);
 
                 try {
-                    apiAuthTable.write(myTokenID, apiAuthRec);
-                } catch (T24IOException e) {
+                    String trimmedResponse = jwtResponse.toString().replaceAll("^\"|\"$", "").replace("\\", "");
+                    JSONObject jsonResponse = new JSONObject(trimmedResponse);
+
+                    // Extract the token value
+                    String token = "";
+                    if (jsonResponse.has("id_token")) {
+                        token = jsonResponse.getString("id_token");
+                    } else {
+                        System.out.println("Error: id_token is not found in JSON response");
+                    }
+
+                    // Write the JWT Token in EB.JBL.API.AUTH.TABLE Template...
+                    EbJblApiAuthTableTable apiAuthTable = new EbJblApiAuthTableTable(this);
+                    apiAuthRec.setJwtToken(token);
+
+                    try {
+                        apiAuthTable.write(myTokenID, apiAuthRec);
+                    } catch (T24IOException e) {
+                    }
+                } catch (Exception e) {
+                    System.out.println("Error occurred while extracting token: " + e.getMessage());
                 }
-            } catch (Exception e) {
-                System.out.println("Error occurred while extracting token: " + e.getMessage());
-            }
-            // JWT Token Done
+                // JWT Token Done
         }
 
         // COSUMING THE API FROM AML & CREATE LOGIC BASED ON THE RESPONSE
         // Calling the MAIN API - GET Method - makeGetRequestForAML
-        String GET_URL_TP = "";
-        GET_URL_TP = "http://localhost:9089/CusJwtContainer/api/v1.0.0/party/ws/800155";
+            String GET_URL_TP = "";
+            GET_URL_TP = "http://localhost:9089/CusJwtContainer/api/v1.0.0/party/ws/800155";
 
-        System.out.println("Calling AML Api");
-        StringBuilder amlResponse = this.makeGetRequestForAML(GET_URL_TP);
+            System.out.println("Calling AML Api");
+            StringBuilder amlResponse = this.makeGetRequestForAML(GET_URL_TP);
 
-        // UPDATE HERE
-        JSONObject jsonAml = null;
+            // UPDATE HERE
+            JSONObject jsonAml = null;
 
-        try {
-            jsonAml = new JSONObject(amlResponse.toString());
-        } catch (JSONException e) {
-        }
-
-        try {
-            if (jsonAml.getJSONObject("header").get("status").toString().equals("success")) {
-                // cusRec.getLocalRefField("LT.AML.STATUS").setValue("SENT");
-                cusRec.getAmlCheck().setValue("SENT");
-                cusRec.getAmlResult().setValue("RESULT.AWAITED");
-
-                /*
-                 * Tracer try (FileWriter fw = new
-                 * FileWriter("/Temenos/T24/UD/Tracer/CustomerRecord-" + id +
-                 * ".txt", true); BufferedWriter bw = new BufferedWriter(fw);
-                 * PrintWriter out = new PrintWriter(bw)) {
-                 * out.println("Customer Record- " + id + "\n" + cusRec); }
-                 * catch (IOException e) { } Tracer
-                 */
-
-                SynchronousTransactionData txnData = new SynchronousTransactionData();
-                txnData.setFunction("INPUTT");
-                txnData.setNumberOfAuthoriser("1");
-                txnData.setSourceId("BULK.OFS");
-                txnData.setTransactionId(id);
-                txnData.setVersionId("CUSTOMER,AML");
-
-                transactionData.add(txnData);
-                records.add(cusRec.toStructure());
-            } else {
+            try {
+                jsonAml = new JSONObject(amlResponse.toString());
+            } catch (JSONException e) {
             }
 
-        } catch (JSONException e) {
-        }
+            try {
+                if (jsonAml.getJSONObject("header").get("status").toString().equals("success")) {
+                    // cusRec.getLocalRefField("LT.AML.STATUS").setValue("SENT");
+                    cusRec.getAmlCheck().setValue("SENT");
+                    cusRec.getAmlResult().setValue("RESULT.AWAITED");
+
+                    /*
+                     * Tracer try (FileWriter fw = new
+                     * FileWriter("/Temenos/T24/UD/Tracer/CustomerRecord-" + id
+                     * + ".txt", true); BufferedWriter bw = new
+                     * BufferedWriter(fw); PrintWriter out = new
+                     * PrintWriter(bw)) { out.println("Customer Record- " + id +
+                     * "\n" + cusRec); } catch (IOException e) { } Tracer
+                     */
+
+                    SynchronousTransactionData txnData = new SynchronousTransactionData();
+                    txnData.setFunction("INPUTT");
+                    txnData.setNumberOfAuthoriser("1");
+                    txnData.setSourceId("BULK.OFS");
+                    txnData.setTransactionId(id);
+                    txnData.setVersionId("CUSTOMER,AML");
+
+                    transactionData.add(txnData);
+                    records.add(cusRec.toStructure());
+                } else {
+                }
+
+            } catch (JSONException e) {
+            }
     }
 
     // END OF MAIN METHOD
 
     // AES decryption method
     public static String decrypt(String strToDecrypt, String secret) {
+        
+        System.out.println("decrypt Method is called...");
         try {
             SecretKeySpec secretKey = new SecretKeySpec(secret.getBytes(), "AES");
             Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
@@ -179,12 +188,15 @@ public class ApJblCusAmlConsumeAPIService extends ServiceLifecycle {
     public StringBuilder makeGetRequestForJWT(String GET_URL) {
         StringBuilder response = new StringBuilder();
         HttpURLConnection con = null;
+        
+        System.out.println("makeGetRequestForJWT Method is called...");
 
         // Decryption key (must be 16 characters for AES encryption)
         String decryptionKey = "";
         decryptionKey = "MyKey$forJBLApi&";
         // Decrypt
         decryptedBase64 = decrypt(encryptedBase64Credentials, decryptionKey);
+        System.out.println("My Decrypted code is: " + decryptedBase64);
         // Decryption DONE!
         try {
             URL url = new URL(GET_URL);
@@ -229,7 +241,8 @@ public class ApJblCusAmlConsumeAPIService extends ServiceLifecycle {
             con.disconnect();
 
         } catch (IOException e) {
-            e.printStackTrace();
+            // e.printStackTrace();
+            System.out.println("JWT Token API: Rest call encountered an error: "  + e.getMessage());
         }
         return response;
     }
@@ -239,6 +252,8 @@ public class ApJblCusAmlConsumeAPIService extends ServiceLifecycle {
     public StringBuilder makeGetRequestForAML(String GET_URL) {
         StringBuilder response = new StringBuilder();
         HttpURLConnection con = null;
+        
+        System.out.println("makeGetRequestForAML Method is called...");
 
         try {
             URL url = new URL(GET_URL);
@@ -279,7 +294,8 @@ public class ApJblCusAmlConsumeAPIService extends ServiceLifecycle {
             con.disconnect();
 
         } catch (IOException e) {
-            e.printStackTrace();
+           // e.printStackTrace();
+            System.out.println("AML API: Rest call encountered an error: " + e.getMessage());
         }
         return response;
     } // END of GET Method -- MAIN API
