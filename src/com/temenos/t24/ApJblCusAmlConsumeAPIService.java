@@ -51,7 +51,7 @@ public class ApJblCusAmlConsumeAPIService extends ServiceLifecycle {
         DataAccess da = new DataAccess(this);
         List<String> recordIDs = da.selectRecords("", "CUSTOMER", "$NAU",
                 "WITH AML.RESULT EQ NULL AND RECORD.STATUS EQ INAU");
-       // System.out.println("Record ID's Are: " + recordIDs);
+        // System.out.println("Record ID's Are: " + recordIDs);
         int cnt = recordIDs.size();
         System.out.println(cnt + " Are Selected");
 
@@ -62,32 +62,32 @@ public class ApJblCusAmlConsumeAPIService extends ServiceLifecycle {
     public void updateRecord(String id, ServiceData serviceData, String controlItem,
             TransactionControl transactionControl, List<SynchronousTransactionData> transactionData,
             List<TStructure> records) {
-
-        DataAccess da = new DataAccess(this);
-        CustomerRecord cusRec = new CustomerRecord(da.getRecord("", "CUSTOMER", "$NAU", id));
-
-        System.out.println("Customer Record ID is: " + id);
-        // JWT Token
-        String myTokenID = "";
-        myTokenID = "AML";
-
-        EbJblApiAuthTableRecord apiAuthRec = new EbJblApiAuthTableRecord(
-                da.getRecord("EB.JBL.API.AUTH.TABLE", myTokenID));
-
-        String basicAuth = "";
         try {
-            basicAuth = apiAuthRec.getBasicAuth().getValue();
-            myJwtToken = apiAuthRec.getJwtToken().getValue();
-            System.out.println("basicAuth Token is: " + basicAuth);
-            System.out.println("JWT Token is: " + myJwtToken);
-        } catch (Exception e1) {
-        }
+            DataAccess da = new DataAccess(this);
+            CustomerRecord cusRec = new CustomerRecord(da.getRecord("", "CUSTOMER", "$NAU", id));
 
-        encryptedBase64Credentials = basicAuth;
+            System.out.println("Customer Record ID is: " + id);
+            // JWT Token
+            String myTokenID = "";
+            myTokenID = "AML";
 
-        // Check either JWT is generated or not/EXPIRED.
-        if (myJwtToken == "") {
-            // GET API Call to Generate JWT Auth Token
+            EbJblApiAuthTableRecord apiAuthRec = new EbJblApiAuthTableRecord(
+                    da.getRecord("EB.JBL.API.AUTH.TABLE", myTokenID));
+
+            String basicAuth = "";
+            try {
+                basicAuth = apiAuthRec.getBasicAuth().getValue();
+                myJwtToken = apiAuthRec.getJwtToken().getValue();
+                System.out.println("basicAuth Token is: " + basicAuth);
+                System.out.println("JWT Token is: " + myJwtToken);
+            } catch (Exception e1) {
+            }
+
+            encryptedBase64Credentials = basicAuth;
+
+            // Check either JWT is generated or not/EXPIRED.
+            if (myJwtToken == "") {
+                // GET API Call to Generate JWT Auth Token
                 String GET_URL_TP = "";
                 GET_URL_TP = "http://localhost:9089/irf-auth-token-generation-container-21.0.59/api/v1.0.0/generateauthtoken";
                 StringBuilder jwtResponse = null;
@@ -114,13 +114,13 @@ public class ApJblCusAmlConsumeAPIService extends ServiceLifecycle {
                     } catch (T24IOException e) {
                     }
                 } catch (Exception e) {
-                    System.out.println("Error occurred while extracting token: " + e.getMessage());
+                    System.out.println("Error occurred while extracting the JWT token: " + e.getMessage());
                 }
                 // JWT Token Done
-        }
+            }
 
-        // COSUMING THE API FROM AML & CREATE LOGIC BASED ON THE RESPONSE
-        // Calling the MAIN API - GET Method - makeGetRequestForAML
+            // COSUMING THE API FROM AML & CREATE LOGIC BASED ON THE RESPONSE
+            // Calling the MAIN API - GET Method - makeGetRequestForAML
             String GET_URL_TP = "";
             GET_URL_TP = "http://localhost:9089/CusJwtContainer/api/v1.0.0/party/ws/800155";
 
@@ -164,13 +164,17 @@ public class ApJblCusAmlConsumeAPIService extends ServiceLifecycle {
 
             } catch (JSONException e) {
             }
+
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     // END OF MAIN METHOD
 
     // AES decryption method
     public static String decrypt(String strToDecrypt, String secret) {
-        
+
         System.out.println("decrypt Method is called...");
         try {
             SecretKeySpec secretKey = new SecretKeySpec(secret.getBytes(), "AES");
@@ -188,7 +192,7 @@ public class ApJblCusAmlConsumeAPIService extends ServiceLifecycle {
     public StringBuilder makeGetRequestForJWT(String GET_URL) {
         StringBuilder response = new StringBuilder();
         HttpURLConnection con = null;
-        
+
         System.out.println("makeGetRequestForJWT Method is called...");
 
         // Decryption key (must be 16 characters for AES encryption)
@@ -242,7 +246,7 @@ public class ApJblCusAmlConsumeAPIService extends ServiceLifecycle {
 
         } catch (IOException e) {
             // e.printStackTrace();
-            System.out.println("JWT Token API: Rest call encountered an error: "  + e.getMessage());
+            System.out.println("JWT Token API: Rest call encountered an error: " + e.getMessage());
         }
         return response;
     }
@@ -252,7 +256,7 @@ public class ApJblCusAmlConsumeAPIService extends ServiceLifecycle {
     public StringBuilder makeGetRequestForAML(String GET_URL) {
         StringBuilder response = new StringBuilder();
         HttpURLConnection con = null;
-        
+
         System.out.println("makeGetRequestForAML Method is called...");
 
         try {
@@ -294,7 +298,7 @@ public class ApJblCusAmlConsumeAPIService extends ServiceLifecycle {
             con.disconnect();
 
         } catch (IOException e) {
-           // e.printStackTrace();
+            // e.printStackTrace();
             System.out.println("AML API: Rest call encountered an error: " + e.getMessage());
         }
         return response;
