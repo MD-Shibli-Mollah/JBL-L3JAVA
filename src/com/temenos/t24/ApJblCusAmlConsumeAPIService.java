@@ -134,6 +134,21 @@ public class ApJblCusAmlConsumeAPIService extends ServiceLifecycle {
                 jsonAml = new JSONObject(amlResponse.toString());
             } catch (JSONException e) {
             }
+            // TEST OFS for Customer Record ID is: 101153
+            /*
+             * if (id.equals("101153")) { cusRec.getAmlCheck().setValue("SENT");
+             * cusRec.getAmlResult().setValue("RESULT.AWAITED");
+             * 
+             * SynchronousTransactionData txnData = new
+             * SynchronousTransactionData(); txnData.setFunction("INPUTT");
+             * txnData.setNumberOfAuthoriser("1");
+             * txnData.setSourceId("BULK.OFS"); txnData.setTransactionId(id);
+             * txnData.setVersionId("CUSTOMER,AML");
+             * 
+             * transactionData.add(txnData); records.add(cusRec.toStructure());
+             * }
+             */
+            // TEST END
 
             try {
                 if (jsonAml.getJSONObject("header").get("status").toString().equals("success")) {
